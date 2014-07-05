@@ -1,38 +1,39 @@
 describe('enki binder', function () {
-    var testObject = {x: 1,
-        t:{y:1},
-        z: [1, 2, 3]
+    var testObject = {normalProperty: 1,
+        objectProperty:{nestedProperty:1},
+        arrayProperty: [1, 2, 3]
     };
-    testObject = {t: {y: 1},
-        x: 1};
     enki.init(testObject);
 
     it('should attach functioning notifiers', function () {
         var updateResult = 0;
-        enki.addListener(testObject, 'x', function (value) {
+        enki.addListener(testObject, 'normalProperty', function (value) {
             updateResult = value;
         });
-        testObject.x = 'test';
+        testObject.normalProperty = 'test';
         expect(updateResult).toBe('test');
     });
+
     it('should work for nested properties', function () {
         var updateResult = 0;
-        enki.addListener(testObject, 't.y', function (value) {
+        enki.addListener(testObject, 'objectProperty.nestedProperty', function (value) {
             updateResult = value;
         });
-        testObject.t.y = 'test';
+        testObject.objectProperty.nestedProperty = 'test';
         expect(updateResult).toBe('test');
     });
+
     it('should work for properties that are arrays',function(){
         var updateResult=0;
-        enki.addListener(testObject, 'x.y', function (value) {
+        enki.addListener(testObject, 'normalProperty.nestedProperty', function (value) {
             updateResult = value;
         });
-        testObject.z=[1,3,5];
+        testObject.arrayProperty=[1,3,5];
         expect(updateResult).toEqual([1,3,5]);
     });
+
     it('shouldn\'t affect property behavior', function () {
-        testObject.x = 2;
-        expect(testObject.x).toBe(2);
+        testObject.normalProperty = 2;
+        expect(testObject.normalProperty).toBe(2);
     });
 });

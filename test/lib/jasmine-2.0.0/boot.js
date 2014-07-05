@@ -119,7 +119,7 @@
 
   /**
    * ## Reporters
-   * The `HtmlReporter` builds all of the HTML UI for the runner page. This reporter paints the dots, stars, and x's for specs, as well as all spec names and all failures (if any).
+   * The `HtmlReporter` builds all of the HTML UI for the runner page. This reporter paints the dots, stars, and normalProperty's for specs, as well as all spec names and all failures (if any).
    */
   var htmlReporter = new jasmine.HtmlReporter({
     env: env,
