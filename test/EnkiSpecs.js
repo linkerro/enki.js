@@ -37,6 +37,15 @@ describe('enki object initializer', function () {
         expect(updateResult).toEqual([1, 3, 5, 7]);
     });
 
+    it('should attach computable properties', function () {
+        enki.extend(viewModel1,'computable',function(model){
+            return model.objectProperty.nestedProperty+model.normalProperty;
+        });
+        viewModel1.nestedProperty.normalProperty=1;
+        viewModel1.normalProperty=20;
+        expect(viewModel1.computable).toBe(21);
+    });
+
     it('shouldn\'t affect property behavior', function () {
         viewModel1.normalProperty = 2;
         expect(viewModel1.normalProperty).toBe(2);
@@ -97,6 +106,18 @@ describe('enki bindings', function () {
             var element = document.getElementById('bindingTest');
             var input = document.getElementById('bindingTest2');
             input.value='asfasdfasfd';
+            input.onchange();
+            expect(element.innerHTML).toBe(input.value);
+        });
+        it ('should trigger two way binding ok key up', function () {
+            var viewModel = {normalProperty: 1};
+            setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>'+
+                '<input id="bindingTest2" type="text" data-bind="liveValue: normalProperty" />'));
+            enki.bindDocument(viewModel);
+            var element = document.getElementById('bindingTest');
+            var input = document.getElementById('bindingTest2');
+            input.value='asfasdfasfd';
+            input.onkeyup();
             expect(element.innerHTML).toBe(input.value);
         });
     });
