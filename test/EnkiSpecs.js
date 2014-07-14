@@ -38,12 +38,25 @@ describe('enki object initializer', function () {
     });
 
     it('should attach computable properties', function () {
-        enki.extend(viewModel1,'computable',function(model){
-            return model.objectProperty.nestedProperty+model.normalProperty;
+        enki.extend(viewModel1, 'computable', function (model) {
+            return model.objectProperty.nestedProperty + model.normalProperty;
         });
-        viewModel1.nestedProperty.normalProperty=1;
-        viewModel1.normalProperty=20;
+        viewModel1.objectProperty.nestedProperty = 1;
+        viewModel1.normalProperty = 20;
         expect(viewModel1.computable).toBe(21);
+    });
+
+    it('should notify computables of changes in tracked properties', function () {
+        var callCount = 0;
+        enki.extend(viewModel1, 'computable2', function (model) {
+            return model.objectProperty.nestedProperty + model.normalProperty;
+        });
+        enki.addListener(viewModel1, 'computable2', function () {
+            callCount += 1;
+        });
+        viewModel1.objectProperty.nestedProperty = 203;
+        viewModel1.normalProperty = 3;
+        expect(callCount).toBe(2);
     });
 
     it('shouldn\'t affect property behavior', function () {
@@ -90,7 +103,7 @@ describe('enki bindings', function () {
             document.getElementById('clickTest').onclick();
             expect(hasClicked).toBe(true);
         });
-        it ('should trigger one way binding', function () {
+        it('should trigger one way binding', function () {
             var viewModel = {normalProperty: 1};
             setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>'));
             enki.bindDocument(viewModel);
@@ -98,27 +111,32 @@ describe('enki bindings', function () {
             var element = document.getElementById('bindingTest');
             expect(element.innerHTML).toBe(viewModel.normalProperty);
         });
-        it ('should trigger two way binding', function () {
+        it('should trigger two way binding', function () {
             var viewModel = {normalProperty: 1};
-            setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>'+
+            setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>' +
                 '<input id="bindingTest2" type="text" data-bind="value: normalProperty" />'));
             enki.bindDocument(viewModel);
             var element = document.getElementById('bindingTest');
             var input = document.getElementById('bindingTest2');
-            input.value='asfasdfasfd';
+            input.value = 'asfasdfasfd';
             input.onchange();
             expect(element.innerHTML).toBe(input.value);
         });
-        it ('should trigger two way binding ok key up', function () {
+        it('should trigger two way binding ok key up', function () {
             var viewModel = {normalProperty: 1};
-            setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>'+
+            setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>' +
                 '<input id="bindingTest2" type="text" data-bind="liveValue: normalProperty" />'));
             enki.bindDocument(viewModel);
             var element = document.getElementById('bindingTest');
             var input = document.getElementById('bindingTest2');
-            input.value='asfasdfasfd';
+            input.value = 'asfasdfasfd';
             input.onkeyup();
             expect(element.innerHTML).toBe(input.value);
+        });
+        it('should trigger bindings for computed properties', function () {
+            var viewModel={property1:'sdf',
+            property2:'sdf'};
+
         });
     });
 });
