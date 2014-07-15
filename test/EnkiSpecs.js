@@ -38,7 +38,7 @@ describe('enki object initializer', function () {
     });
 
     it('should attach computable properties', function () {
-        enki.extend(viewModel1, 'computable', function (model) {
+        enki.addComputable(viewModel1, 'computable', function (model) {
             return model.objectProperty.nestedProperty + model.normalProperty;
         });
         viewModel1.objectProperty.nestedProperty = 1;
@@ -48,7 +48,7 @@ describe('enki object initializer', function () {
 
     it('should notify computables of changes in tracked properties', function () {
         var callCount = 0;
-        enki.extend(viewModel1, 'computable2', function (model) {
+        enki.addComputable(viewModel1, 'computable2', function (model) {
             return model.objectProperty.nestedProperty + model.normalProperty;
         });
         enki.addListener(viewModel1, 'computable2', function () {
@@ -134,9 +134,25 @@ describe('enki bindings', function () {
             expect(element.innerHTML).toBe(input.value);
         });
         it('should trigger bindings for computed properties', function () {
-            var viewModel={property1:'sdf',
-            property2:'sdf'};
-
+            var viewModel = {property1: 'sdf',
+                property2: 'sdf'};
+            enki.extend(viewModel, 'computed', function (model) {
+                return model.property1 + model.property2;
+            });
+            enki.bindDocument(viewModel);
+            setFixtures('<div id="bindingTest" data-bind="text: computed"></div>' +
+                '<input id="input1" type="text" data-bind="value: property1" />' +
+                '<input id="input2" type="text" data-bind="value: property2" />');
+            enki.bindDocument(viewModel);
+            var element = document.getElementById('bindingTest');
+            var input1 = document.getElementById('input1');
+            var input2 = document.getElementById('input2');
+            var value = 'alfalfa';
+            input1.value = value;
+            input2.value = value;
+            input1.onchange();
+            input2.onchange();
+            expect(element.innerHTML).toBe(value + value);
         });
     });
 });
