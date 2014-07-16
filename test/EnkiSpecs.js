@@ -92,17 +92,7 @@ describe('enki document binder', function () {
 });
 
 describe('enki bindings', function () {
-    describe('click binding', function () {
-        it('should trigger the clicked event', function () {
-            setFixtures(sandbox('<div id="clickTest" data-bind="click: testFunction"></div>'));
-            var hasClicked = false;
-            var viewModel = {testFunction: function () {
-                hasClicked = true;
-            }};
-            enki.bindDocument(viewModel);
-            document.getElementById('clickTest').onclick();
-            expect(hasClicked).toBe(true);
-        });
+    describe('text and value bindings', function () {
         it('should trigger one way binding', function () {
             var viewModel = {normalProperty: 1};
             setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>'));
@@ -122,7 +112,7 @@ describe('enki bindings', function () {
             input.onchange();
             expect(element.innerHTML).toBe(input.value);
         });
-        it('should trigger two way binding ok key up', function () {
+        it('should trigger two way live binding', function () {
             var viewModel = {normalProperty: 1};
             setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>' +
                 '<input id="bindingTest2" type="text" data-bind="liveValue: normalProperty" />'));
@@ -179,6 +169,18 @@ describe('enki bindings', function () {
             input2.onchange();
             expect(element1.innerHTML).toBe(value1 + value2);
             expect(element2.innerHTML).toBe(value2 + value1);
+        });
+    });
+    describe('click binding', function () {
+        it('should trigger the clicked event', function () {
+            setFixtures(sandbox('<div id="clickTest" data-bind="click: testFunction"></div>'));
+            var hasClicked = false;
+            var viewModel = {testFunction: function () {
+                hasClicked = true;
+            }};
+            enki.bindDocument(viewModel);
+            document.getElementById('clickTest').onclick();
+            expect(hasClicked).toBe(true);
         });
     });
 });
