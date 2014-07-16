@@ -153,5 +153,32 @@ describe('enki bindings', function () {
             input2.onchange();
             expect(element.innerHTML).toBe(value + value);
         });
+        it('should trigger bindings for multiple computed properties', function () {
+            var viewModel = {property1: 'sdf',
+                property2: 'sdf'};
+            enki.extend(viewModel, 'computed', function (model) {
+                return model.property1 + model.property2;
+            });
+            enki.extend(viewModel, 'computed2', function (model) {
+                return model.property2 + model.property1;
+            });
+            setFixtures('<div id="bindingTest" data-bind="text: computed"></div>' +
+                '<div id="bindingTest2" data-bind="text: computed2"></div>' +
+                '<input id="input1" type="text" data-bind="liveValue: property1" />' +
+                '<input id="input2" type="text" data-bind="value: property2" />');
+            enki.bindDocument(viewModel);
+            var element1 = document.getElementById('bindingTest');
+            var element2 = document.getElementById('bindingTest2');
+            var input1 = document.getElementById('input1');
+            var input2 = document.getElementById('input2');
+            var value1 = 'alfalfa';
+            var value2 = 'lksjdfk';
+            input1.value = value1;
+            input2.value = value2;
+            input1.onkeyup();
+            input2.onchange();
+            expect(element1.innerHTML).toBe(value1 + value2);
+            expect(element2.innerHTML).toBe(value2 + value1);
+        });
     });
 });
