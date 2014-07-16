@@ -139,9 +139,8 @@ describe('enki bindings', function () {
             enki.extend(viewModel, 'computed', function (model) {
                 return model.property1 + model.property2;
             });
-            enki.bindDocument(viewModel);
             setFixtures('<div id="bindingTest" data-bind="text: computed"></div>' +
-                '<input id="input1" type="text" data-bind="value: property1" />' +
+                '<input id="input1" type="text" data-bind="liveValue: property1" />' +
                 '<input id="input2" type="text" data-bind="value: property2" />');
             enki.bindDocument(viewModel);
             var element = document.getElementById('bindingTest');
@@ -150,7 +149,7 @@ describe('enki bindings', function () {
             var value = 'alfalfa';
             input1.value = value;
             input2.value = value;
-            input1.onchange();
+            input1.onkeyup();
             input2.onchange();
             expect(element.innerHTML).toBe(value + value);
         });
