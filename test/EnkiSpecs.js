@@ -228,4 +228,18 @@ describe('templating system', function () {
         var div=document.getElementById('testDiv');
         expect(div.innerHTML).toBe(viewModel.model.prop);
     });
+    it('should bind multiple templates', function () {
+        setFixtures('<script type="text/html" id="template"><div class="testDiv" data-bind="text: prop"></div></script>' +
+            '<div id="div1" data-bind="template: {name: template,model:model}"></div>' +
+            '<div id="div2" data-bind="template: {name: template,model:model2}"></div>');
+        var viewModel={
+            model:{prop:'propertyValue'},
+            model2:{prop:'ftyuk,mnbftyj'}
+        };
+        enki.bindDocument(viewModel);
+        var div1=document.getElementById('div1').getElementsByClassName('testDiv')[0];
+        var div2=document.getElementById('div2').getElementsByClassName('testDiv')[0];
+        expect(div1.innerHTML).toBe(viewModel.model.prop);
+        expect(div2.innerHTML).toBe(viewModel.model2.prop);
+    });
 });
