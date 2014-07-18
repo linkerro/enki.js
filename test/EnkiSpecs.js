@@ -199,25 +199,33 @@ describe('enki bindings', function () {
             expect(div2.innerHTML).toBe('');
         });
     })
-    describe('multiple specific elements binding', function () {
-        it('should bind text and value fields', function () {
-            var viewModel = {prop1: 'lkjlkj',
-                prop2: 'dfvbnmngtyh'};
-            var viewModel2 = {prop3: 'ljsdflkj'};
-            setFixtures('<div id="view"><div id="textTest" data-bind="text:prop1"></div>' +
-                '<input type="text" id="valueTest" data-bind="value:prop2" /></div>' +
-                '<div id="outsideView" data-bind="textTest"></div>' +
-                '<div id="view2"><div id="prop3" data-bind="text:prop3"></div></div>');
-            enki.bindDocument(viewModel, 'view');
-            enki.bindDocument(viewModel2, 'view2');
-            var div = document.getElementById('textTest');
-            var div2 = document.getElementById('outsideView');
-            var input = document.getElementById('valueTest');
-            var prop3 = document.getElementById('prop3');
-            expect(div.innerHTML).toBe(viewModel.prop1);
-            expect(input.value).toBe(viewModel.prop2);
-            expect(div2.innerHTML).toBe('');
-            expect(prop3.innerHTML).toBe(viewModel2.prop3);
-        });
-    })
+    it('multiple specific elements binding', function () {
+        var viewModel = {prop1: 'lkjlkj',
+            prop2: 'dfvbnmngtyh'};
+        var viewModel2 = {prop3: 'ljsdflkj'};
+        setFixtures('<div id="view"><div id="textTest" data-bind="text:prop1"></div>' +
+            '<input type="text" id="valueTest" data-bind="value:prop2" /></div>' +
+            '<div id="outsideView" data-bind="textTest"></div>' +
+            '<div id="view2"><div id="prop3" data-bind="text:prop3"></div></div>');
+        enki.bindDocument(viewModel, 'view');
+        enki.bindDocument(viewModel2, 'view2');
+        var div = document.getElementById('textTest');
+        var div2 = document.getElementById('outsideView');
+        var input = document.getElementById('valueTest');
+        var prop3 = document.getElementById('prop3');
+        expect(div.innerHTML).toBe(viewModel.prop1);
+        expect(input.value).toBe(viewModel.prop2);
+        expect(div2.innerHTML).toBe('');
+        expect(prop3.innerHTML).toBe(viewModel2.prop3);
+    });
+});
+describe('templating system', function () {
+    it('should bind a template', function () {
+        setFixtures('<script type="text/html" id="template"><div id="testDiv" data-bind="text: prop"></div></script>' +
+            '<div data-bind="template: {name: template,model:model}"></div>');
+        var viewModel={model:{prop:'propertyValue'}};
+        enki.bindDocument(viewModel);
+        var div=document.getElementById('testDiv');
+        expect(div.innerHTML).toBe(viewModel.model.prop);
+    });
 });
