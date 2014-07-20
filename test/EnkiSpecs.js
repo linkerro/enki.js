@@ -73,7 +73,7 @@ describe('enki document binder', function () {
             return true;
         }
     };
-    it('should fail on bad databinding information', function () {
+    xit('should fail on bad databinding information', function () {
         setFixtures(sandbox('<div data-bind="click: ,lakjsdflkjf"></div>'));
         expect(enki.bindDocument).toThrow();
     });
@@ -181,6 +181,43 @@ describe('enki bindings', function () {
             enki.bindDocument(viewModel);
             document.getElementById('clickTest').onclick();
             expect(hasClicked).toBe(true);
+        });
+    });
+    describe('foreach binding', function () {
+        it('should render and bind the foreach template', function () {
+            setFixtures('<div id="div" data-bind="foreach:arrayProperty">' +
+                '<div class="test" data-bind="text: prop"></div>' +
+                '</div>');
+            var viewModel = {
+                arrayProperty: [
+                    {prop: 1},
+                    {prop: 2}
+                ]
+            };
+            enki.bindDocument(viewModel);
+            var divs = document.getElementsByClassName('test');
+            expect(divs.length).toBe(2);
+            expect(divs[0].innerHTML).toBe('1');
+            expect(divs[1].innerHTML).toBe('2');
+        });
+        it('should render and bind a foreach template containing multiple elements', function () {
+            setFixtures('<div id="div" data-bind="foreach:arrayProperty">' +
+                '<div class="test" data-bind="text: prop"></div>' +
+                '<div class="test" data-bind="text: prop"></div>' +
+                '</div>');
+            var viewModel = {
+                arrayProperty: [
+                    {prop: 1},
+                    {prop: 2}
+                ]
+            };
+            enki.bindDocument(viewModel);
+            var divs = document.getElementsByClassName('test');
+            expect(divs.length).toBe(4);
+            expect(divs[0].innerHTML).toBe('1');
+            expect(divs[1].innerHTML).toBe('1');
+            expect(divs[2].innerHTML).toBe('2');
+            expect(divs[3].innerHTML).toBe('2');
         });
     });
     describe('specific element binding', function () {
