@@ -183,6 +183,26 @@ describe('enki bindings', function () {
             expect(hasClicked).toBe(true);
         });
     });
+    describe('visible binding', function () {
+        it('should hide and show the given element', function () {
+            setFixtures('<div id="hidable" data-bind="visible: isVisible"></div>');
+            var viewModel = {isVisible: false};
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('hidable');
+            expect(div.style.display).toBe('none');
+            viewModel.isVisible = true;
+            expect(div.style.display).toBe('');
+        });
+        it('should keep the original display mode', function () {
+            setFixtures('<div id="hidable" data-bind="visible: isVisible" style="display: inline"></div>');
+            var viewModel = {isVisible: false};
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('hidable');
+            expect(div.style.display).toBe('none');
+            viewModel.isVisible = true;
+            expect(div.style.display).toBe('inline');
+        });
+    });
     describe('foreach binding', function () {
         it('should render and bind the foreach template', function () {
             setFixtures('<div id="div" data-bind="foreach:arrayProperty">' +
@@ -260,22 +280,22 @@ describe('templating system', function () {
     it('should bind a template', function () {
         setFixtures('<script type="text/html" id="template"><div id="testDiv" data-bind="text: prop"></div></script>' +
             '<div data-bind="template: {name: template,model:model}"></div>');
-        var viewModel={model:{prop:'propertyValue'}};
+        var viewModel = {model: {prop: 'propertyValue'}};
         enki.bindDocument(viewModel);
-        var div=document.getElementById('testDiv');
+        var div = document.getElementById('testDiv');
         expect(div.innerHTML).toBe(viewModel.model.prop);
     });
     it('should bind multiple templates', function () {
         setFixtures('<script type="text/html" id="template"><div class="testDiv" data-bind="text: prop"></div></script>' +
             '<div id="div1" data-bind="template: {name: template,model:model}"></div>' +
             '<div id="div2" data-bind="template: {name: template,model:model2}"></div>');
-        var viewModel={
-            model:{prop:'propertyValue'},
-            model2:{prop:'ftyuk,mnbftyj'}
+        var viewModel = {
+            model: {prop: 'propertyValue'},
+            model2: {prop: 'ftyuk,mnbftyj'}
         };
         enki.bindDocument(viewModel);
-        var div1=document.getElementById('div1').getElementsByClassName('testDiv')[0];
-        var div2=document.getElementById('div2').getElementsByClassName('testDiv')[0];
+        var div1 = document.getElementById('div1').getElementsByClassName('testDiv')[0];
+        var div2 = document.getElementById('div2').getElementsByClassName('testDiv')[0];
         expect(div1.innerHTML).toBe(viewModel.model.prop);
         expect(div2.innerHTML).toBe(viewModel.model2.prop);
     });
