@@ -240,6 +240,24 @@ describe('enki bindings', function () {
             expect(divs[3].innerHTML).toBe('2');
         });
     });
+    describe('attributes binding', function () {
+        it('should bind to element attributes', function () {
+            setFixtures('<div id="attributes" data-bind="attributes:{airplane:isAirplane}"></div>');
+            var viewModel = {isAirplane: false};
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('attributes');
+            expect(div.getAttribute('airplane')).toBe('false');
+            viewModel.isAirplane=true;
+            expect(div.getAttribute('airplane')).toBe('true');
+        });
+        it('should bind to attributs that have invalid javascript names', function () {
+            setFixtures('<div id="attributes" data-bind="attributes:{data-manipulation:isManipulated}"></div>');
+            var viewModel = {isManipulated: false};
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('attributes');
+            expect(div.getAttribute('data-manipulation')).toBe('false');
+        });
+    });
     describe('specific element binding', function () {
         it('should bind text and value fields', function () {
             var viewModel = {prop1: 'lkjlkj',
