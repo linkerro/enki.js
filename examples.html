@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h1 data-bind="text: title"></h1>
+    <script type="application/javascript" src="lib/enki.js"></script>
+    <script type="application/javascript">
+        var viewModel = {
+            title:'This is your page title'
+        };
+        enki.bindDocument(viewModel);
+    </script>
+
+    <input type="text" data-bind="value: userName"/>
+    <script type="application/javascript">
+        var viewModel = {
+            userName:''
+        };
+    </script>
+
+    <input type="button" data-bind="click:buttonClick"/>
+    <script type="application/javascript">
+        var viewModel={
+            timesClicked:0,
+            buttonClick: function () {
+                this.timesClicked+=1;
+            }
+        }
+    </script>
+</body>
+</html>
