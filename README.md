@@ -61,7 +61,40 @@ this is called one way binding.
         var viewModel = {
             userName:''
         };
+        enki.bindDocument(viewModel);
     </script>
 
 The `value` binding is for binding properties to input elements. It works by setting and reading the value of the
 element. Since this binding also updates the JavaScript object, not just the HTML element, it is called two way binding.
+
+**click binding**
+
+    <input type="button" data-bind="click:buttonClick"/>
+    <script type="application/javascript">
+        var viewModel={
+            timesClicked:0,
+            buttonClick: function () {
+                this.timesClicked+=1;
+            }
+        }
+        enki.bindDocument(viewModel);
+    </script>
+
+The 'click' binding is meant for attaching events to any html tag.
+
+**visible binding**
+
+    <div data-bind="visible:isVisible">This div should not be visible</div>
+    <script type="application/javascript">
+        var viewModel={
+            isVisible:false
+        }
+        enki.bindDocument(viewModel);
+    </script>
+
+The visible binding is used for showing or hiding elements. Of not is that it restores the css display property of the
+element to its original value. For instance a div with `display:inline` will have its `display` property set to `none`
+for a falsey value of the binding and to `inline` when the property value is truthy.
+
+**foreach binding**
+

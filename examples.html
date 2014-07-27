@@ -19,6 +19,7 @@
         var viewModel = {
             userName:''
         };
+        enki.bindDocument(viewModel);
     </script>
 
     <input type="button" data-bind="click:buttonClick"/>
@@ -29,6 +30,19 @@
                 this.timesClicked+=1;
             }
         }
+        enki.bindDocument(viewModel);
     </script>
+
+    <div data-bind="visible:isVisible">This div should not be visible</div>
+    <script type="application/javascript">
+        var viewModel={
+            isVisible:false
+        }
+        enki.bindDocument(viewModel);
+    </script>
+
+    <div data-bind="foreach: items">
+        <div data-bind="text: "></div>
+    </div>
 </body>
 </html>

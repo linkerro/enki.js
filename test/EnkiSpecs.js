@@ -239,6 +239,21 @@ describe('enki bindings', function () {
             expect(divs[2].innerHTML).toBe('2');
             expect(divs[3].innerHTML).toBe('2');
         });
+        it('should render bindings using $item and $index', function () {
+            setFixtures('<div id="div" data-bind="foreach:arrayProperty">' +
+                '<div class="item" data-bind="text:$item"></div>' +
+                '<div class="index" class="text:$index"></div>' +
+                '</div>');
+            var viewModel = {
+                arrayProperty: [2]
+            };
+            enki.bindDocument(viewModel);
+            var divs = document.getElementById('div');
+            var itemDiv = document.getElementsByClassName('item');
+            var indexDiv = document.getElementsByClassName('index');
+            expect(itemDiv.innerHTML).toBe(2);
+            expect(indexDiv.innerHTML).toBe(0);
+        });
     });
     describe('attributes binding', function () {
         it('should bind to element attributes', function () {
