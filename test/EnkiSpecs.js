@@ -239,22 +239,6 @@ describe('enki bindings', function () {
             expect(divs[2].innerHTML).toBe('2');
             expect(divs[3].innerHTML).toBe('2');
         });
-        xit('should render and bind a foreach template using $item and $index', function () {
-            setFixtures('<div id="div" data-bind="foreach:arrayProperty">' +
-                '<div class="item" data-bind="text: $item"></div>' +
-                '<div class="index" data-bind="text: $index"></div>' +
-                '</div>');
-            var viewModel = {
-                arrayProperty: [11,22]
-            };
-            enki.bindDocument(viewModel);
-            var indexDivs = document.getElementsByClassName('index');
-            var itemDivs = document.getElementsByClassName('item');
-            expect(indexDivs[0].innerHTML).toBe('0');
-            expect(indexDivs[1].innerHTML).toBe('1');
-            expect(itemDivs[2].innerHTML).toBe('11');
-            expect(itemDivs[3].innerHTML).toBe('22');
-        });
     });
     describe('attributes binding', function () {
         it('should bind to element attributes', function () {
@@ -332,5 +316,16 @@ describe('templating system', function () {
         var div2 = document.getElementById('div2').getElementsByClassName('testDiv')[0];
         expect(div1.innerHTML).toBe(viewModel.model.prop);
         expect(div2.innerHTML).toBe(viewModel.model2.prop);
+    });
+});
+describe('converter system', function () {
+    it('should format simple bindings', function () {
+        setFixtures('<div id="formatted" data-bind="text:{value:number,converter:fixedPrecision,parameter:2}"></div>');
+        var viewModel = {
+            number: 23.4567
+        };
+        enki.bindDocument(viewModel);
+        var div = document.getElementById('formatted');
+        expect(div.innerHTML).toBe('23.46');
     });
 });
