@@ -258,6 +258,28 @@ describe('enki bindings', function () {
             expect(div.getAttribute('data-manipulation')).toBe('false');
         });
     });
+    describe('css class binding', function () {
+        it('should bind css classes', function () {
+            setFixtures('<div id="bound" data-bind="cssClass:{selected:isSelected,disabled:isDisabled}"></div>');
+            var viewModel = {
+                isSelected: false,
+                isDisabled: true
+            };
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('bound');
+            expect(div.classList.toString()).toBe('disabled');
+        });
+        it('should maintain old classes', function () {
+            setFixtures('<div id="bound" class="oldClass" data-bind="cssClass:{selected:isSelected,disabled:isDisabled}"></div>');
+            var viewModel = {
+                isSelected: false,
+                isDisabled: true
+            };
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('bound');
+            expect(div.classList.toString()).toBe('oldClass disabled');
+        });
+    });
     describe('specific element binding', function () {
         it('should bind text and value fields', function () {
             var viewModel = {prop1: 'lkjlkj',
