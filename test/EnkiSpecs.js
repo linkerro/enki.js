@@ -73,7 +73,7 @@ describe('enki document binder', function () {
             return true;
         }
     };
-    xit('should fail on bad databinding information', function () {
+    it('should fail on bad databinding information', function () {
         setFixtures(sandbox('<div data-bind="click: ,lakjsdflkjf"></div>'));
         expect(enki.bindDocument).toThrow();
     });
@@ -247,7 +247,7 @@ describe('enki bindings', function () {
             enki.bindDocument(viewModel);
             var div = document.getElementById('attributes');
             expect(div.getAttribute('airplane')).toBe('false');
-            viewModel.isAirplane=true;
+            viewModel.isAirplane = true;
             expect(div.getAttribute('airplane')).toBe('true');
         });
         it('should bind to attributs that have invalid javascript names', function () {
@@ -319,7 +319,7 @@ describe('templating system', function () {
     });
 });
 describe('converter system', function () {
-    it('should format simple bindings', function () {
+    it('should format numbers to fixed precision', function () {
         setFixtures('<div id="formatted" data-bind="text:{value:number,converter:fixedPrecision,parameter:2}"></div>');
         var viewModel = {
             number: 23.4567
@@ -327,5 +327,23 @@ describe('converter system', function () {
         enki.bindDocument(viewModel);
         var div = document.getElementById('formatted');
         expect(div.innerHTML).toBe('23.46');
+    });
+    it('should format short dates', function () {
+        setFixtures('<div id="formatted" data-bind="text:{value:date, converter:shortDate}"></div>')
+        var viewModel = {
+            date: new Date(1406795490414)
+        };
+        enki.bindDocument(viewModel);
+        var div = document.getElementById('formatted');
+        expect(div.innerHTML).toBe(viewModel.date.toLocaleDateString());
+    });
+    it('should format time', function () {
+        setFixtures('<div id="formatted" data-bind="text:{value:date, converter:time}"></div>');
+        var viewModel = {
+            date: new Date(1406795490414)
+        };
+        enki.bindDocument(viewModel);
+        var div = document.getElementById('formatted');
+        expect(div.innerHTML).toBe(viewModel.date.toLocaleTimeString());
     });
 });
