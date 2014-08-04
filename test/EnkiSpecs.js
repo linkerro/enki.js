@@ -280,6 +280,22 @@ describe('enki bindings', function () {
             expect(div.classList.toString()).toBe('oldClass disabled');
         });
     });
+    describe('event binding', function () {
+        it('should propagate the attached event', function () {
+            setFixtures('<div id="div" data-bind="event:{onclick:click}"></div>');
+            var wasClicked = false;
+            var viewModel = {
+                click: function () {
+                    wasClicked = true;
+                }
+            };
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('div');
+            div.onclick();
+            expect(wasClicked).toBe(true);
+        });
+
+    });
     describe('specific element binding', function () {
         it('should bind text and value fields', function () {
             var viewModel = {prop1: 'lkjlkj',
