@@ -203,6 +203,7 @@ describe('enki bindings', function () {
             expect(div.style.display).toBe('inline');
         });
     });
+
     describe('foreach binding', function () {
         it('should render and bind the foreach template', function () {
             setFixtures('<div id="div" data-bind="foreach:arrayProperty">' +
@@ -311,7 +312,48 @@ describe('enki bindings', function () {
         });
 
     });
-    describe('specific element binding', function () {
+
+    describe('if binding', function () {
+        it('should hide the content in case of falsey value', function () {
+            setFixtures('<div id="container" data-bind="if:falseyProperty"><span>this shouldn\'t be here</span></div>');
+            var viewModel = {
+                falseyProperty: 0
+            };
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('container');
+            expect(div.innerHTML).toBe('');
+        });
+
+        it('should show the content in case of truthy value', function () {
+            setFixtures('<div id="container" data-bind="if:property"><span>this should be here</span></div>');
+            var viewModel = {
+                property: false
+            };
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('container');
+            expect(div.innerHTML).toBe('');
+            viewModel.property = true;
+            expect(div.innerHTML).toBe('<span>this should be here</span>');
+        });
+
+        it('should stop binding inside the if bound element', function () {
+            setFixtures('<div id="container" data-bind="if:property">' +
+                '<span id="bound" data-bind="text:prop1"></span>' +
+                '</div>');
+            var viewModel = {
+                property: undefined
+            };
+            enki.bindDocument(viewModel);
+            var div = document.getElementById('container');
+            expect(div.innerHTML).toBe('');
+            viewModel.property = {prop1: 'test'};
+            expect(div.innerHTML).toBe('<span id="bound" data-bind="text:prop1">test</span>');
+        });
+
+
+    });
+
+    describe('binding on elements instead of document', function () {
         it('should bind text and value fields', function () {
             var viewModel = {prop1: 'lkjlkj',
                 prop2: 'dfvbnmngtyh'};
