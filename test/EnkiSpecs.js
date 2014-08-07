@@ -294,6 +294,21 @@ describe('enki bindings', function () {
             div.onclick();
             expect(wasClicked).toBe(true);
         });
+    });
+
+    describe('checked binding', function () {
+        it('should set the clicked property of a checkbox', function () {
+            setFixtures('<input type="checkbox" id="checkbox" data-bind="checked:isChecked" />');
+            var viewModel = {
+                isChecked: true
+            };
+            enki.bindDocument(viewModel);
+            var input = document.getElementById('checkbox');
+            expect(input.checked).toBe(true);
+            input.checked = false;
+            input.onclick();
+            expect(viewModel.isChecked).toBe(false);
+        });
 
     });
     describe('specific element binding', function () {
