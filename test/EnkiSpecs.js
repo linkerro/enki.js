@@ -442,3 +442,37 @@ describe('converter system', function () {
         expect(div.innerHTML).toBe(viewModel.date.toLocaleTimeString());
     });
 });
+describe('enki validation', function () {
+    beforeEach(function () {
+        setFixtures('');
+    });
+    describe('initialization', function () {
+        it('should associate validation metadata to an object', function () {
+            var viewModel = {
+                stringProperty: 'test'
+            };
+            var validationInfo = {
+                stringProperty: {
+                    required: true
+                }
+            };
+            enki.validation.addMetadata(viewModel, validationInfo);
+            expect(viewModel.__values__.stringProperty.validationAttributes.required).toBe(true);
+        });
+        it('should trigger the validation when a property is changed', function () {
+            var viewModel = {
+                stringProperty: 'test'
+            };
+            var validationInfo = {
+                stringProperty: {
+                    required: true
+                }
+            };
+            enki.validation.addMetadata(viewModel, validationInfo);
+            enki.bindDocument(viewModel);
+            viewModel.stringProperty = 'new value';
+            expect(viewModel.__values__.stringProperty.isValid).toBe(true);
+        });
+    });
+
+});
