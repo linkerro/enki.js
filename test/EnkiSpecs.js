@@ -475,17 +475,21 @@ describe('enki validation', function () {
         });
     });
     describe('bindings', function () {
-        it('should show a validation message when model is invalid', function () {
-            setFixtures('<input id="input" type="text" data-bind="value: textProperty" />' +
-                '<div id="validation" data-bind="validationMessage:{for:textProperty}"></div>');
-            var viewModel = {
+        var viewModel;
+        var validationInfo;
+        beforeEach(function () {
+            viewModel = {
                 textProperty: 'some text'
             };
-            var validationInfo = {
+            validationInfo = {
                 textProperty: {
                     required: true
                 }
             };
+        });
+        it('should show a validation message when model is invalid', function () {
+            setFixtures('<input id="input" type="text" data-bind="value: textProperty" />' +
+                '<div id="validation" data-bind="validationMessage:{for:textProperty}"></div>');
             enki.validation.addMetadata(viewModel, validationInfo);
             enki.bindDocument(viewModel);
             var input = document.getElementById('input');
@@ -493,6 +497,15 @@ describe('enki validation', function () {
             input.value = '';
             input.onchange();
             expect(validation.innerHTML).toBe('Field is required');
+        });
+        it('should add the required class on an element', function () {
+            setFixtures('<input id="input" type="text" data-bind="value: textProperty" />');
+            enki.validation.addMetadata(viewModel, validationInfo);
+            enki.bindDocument(viewModel);
+            var input = document.getElementById('input');
+            input.value = '';
+            input.onchange();
+            expect(input.classList.contains('invalidField')).toBe(true);
         });
     });
 });
