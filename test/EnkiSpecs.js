@@ -474,5 +474,25 @@ describe('enki validation', function () {
             expect(viewModel.__values__.stringProperty.isValid).toBe(true);
         });
     });
-
+    describe('bindings', function () {
+        it('should show a validation message when model is invalid', function () {
+            setFixtures('<input id="input" type="text" data-bind="value: textProperty" />' +
+                '<div id="validation" data-bind="validationMessage:{for:textProperty}"></div>');
+            var viewModel = {
+                textProperty: 'some text'
+            };
+            var validationInfo = {
+                textProperty: {
+                    required: true
+                }
+            };
+            enki.validation.addMetadata(viewModel, validationInfo);
+            enki.bindDocument(viewModel);
+            var input = document.getElementById('input');
+            var validation = document.getElementById('validation');
+            input.value = '';
+            input.onchange();
+            expect(validation.innerHTML).toBe('Field is required');
+        });
+    });
 });
