@@ -413,6 +413,27 @@ describe('templating system', function () {
         expect(div2.innerHTML).toBe(viewModel.model2.prop);
     });
 });
+
+describe('component system', function () {
+    it('should bind components', function () {
+        setFixtures('<script type="text/html" id="componentTemplate"><div class="testDiv" data-bind="text:prop"></div></script>' +
+            '<div id="div" data-bind="component: {name: component, model:model}"></div>');
+        enki.registerComponent('component', function (componentContext) {
+            return {
+                viewModel: {prop:componentContext.model},
+                template: 'componentTemplate'
+            };
+        });
+        var viewModel = {model: 'test'};
+        enki.bindDocument(viewModel);
+        var div = document.getElementById('div');
+        var componentDivs = div.getElementsByClassName('testDiv');
+        expect(componentDivs.length).toBe(1);
+        expect(componentDivs[0].innerHTML).toBe('test');
+        enki.removeComponent('component');
+    });
+});
+
 describe('converter system', function () {
     it('should format numbers to fixed precision', function () {
         setFixtures('<div id="formatted" data-bind="text:{value:number,converter:fixedPrecision,parameter:2}"></div>');
