@@ -15,10 +15,10 @@ describe('enki routing', function () {
     var complexRouteBadExample = 'buy/products/1234/reviews/244/fghjk';
     var complexRouteExample = 'buy/products/1234/reviews/244';
 
-    var area,params;
+    var params;
 
     var component = function (componentContext) {
-        area = componentContext.area;
+        params = componentContext;
 
         return {
             viewModel: {},
@@ -37,11 +37,11 @@ describe('enki routing', function () {
         enki.routing.goToRoot();
     });
 
-    xit('should add simple routes', function () {
+    it('should add simple routes', function () {
         enki.routing.registerRoute(defaultRoute);
     });
 
-    xit('should add complex routes', function () {
+    it('should add complex routes', function () {
         enki.routing.registerRoute(complexRoute);
     });
 
@@ -60,6 +60,8 @@ describe('enki routing', function () {
             component: component
         });
         enki.routing.changePage(complexRouteExample);
-        expect(area).toBe('buy');
+        expect(params.area).toBe('buy');
+        expect(params.id).toBe('1234');
+        expect(params.reviewId).toBe('244');
     });
 });
