@@ -530,3 +530,16 @@ describe('enki validation', function () {
         });
     });
 });
+
+describe('error system', function () {
+    xit('should offer you a place to attach an error logger', function () {
+        var error;
+        setFixtures('<div id="test" data-bind="text:lkajsdflkj"></div>');
+        enki.logging.addListener(function (exception) {
+            error = exception;
+        });
+        enki.bindDocument({});
+        var div = document.getElementById('test');
+
+    });
+})

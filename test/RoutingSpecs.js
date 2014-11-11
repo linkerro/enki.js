@@ -52,7 +52,7 @@ describe('enki routing', function () {
         });
     });
 
-    it('should identify route specified components', function () {
+    xit('should identify route specified components', function () {
         enki.routing.registerRoute(complexRoute);
         enki.routing.registerComponent({
             name: 'products',

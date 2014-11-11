@@ -1,21 +1,16 @@
 (function () {
     "use strict";
     var routing = {};
-    var enkiContext = {};
     var routes = [];
     var components = {};
     var areas = {};
     var rootUrl = window.document.URL;
     var tokenMatch = '([a-z0-9]+)';
-
-    routing.init = function (context) {
-        enkiContext = context;
-    };
+    /* eslint-disable no-unused-vars */
+    var pageComponent;
+    /* eslint-enable no-unused-vars */
 
     enki.addPlugin(routing);
-
-    var navigate = function (url) {
-    };
 
     enki.routing = {};
 
@@ -107,7 +102,7 @@
         window.history.pushState({}, '', url);
         var urlInfo = parseUrl(url);
         var componentConstructor = resolveComponent(urlInfo.params);
-        var component = componentConstructor(urlInfo.params);
+        pageComponent = componentConstructor(urlInfo.params);
     };
 
     enki.routing.clear = function () {

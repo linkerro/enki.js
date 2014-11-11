@@ -13,16 +13,18 @@
         for (var propertyName in values) {
             values[propertyName].validationMessages = []; //reset the messages for a property
             for (var attribute in values[propertyName].validationAttributes) {
-                attributes[attribute] && enki.addListener(viewModel,propertyName, function (value) {
+                /* eslint-disable no-unused-expressions */
+                attributes[attribute] && enki.addListener(viewModel, propertyName, function (value) {
                     var isValid = attributes[attribute].validator(value);
                     values[propertyName].isValid = isValid;
-                    if(!isValid) {
+                    if (!isValid) {
                         values[propertyName].validationMessages.push(attributes[attribute].message);
                         values[propertyName].elements.forEach(function (item) {
                             item.classList.add(defaultErrorClass);
-                        })
+                        });
                     }
                 });
+                /* eslint-enable no-unused-expressions */
             }
         }
     };
@@ -39,11 +41,11 @@
     };
 
     var attributes = {
-        required:{
-            validator:function (value) {
+        required: {
+            validator: function (value) {
                 return !!value;
             },
-            message:'Field is required'
+            message: 'Field is required'
         }
     };
 
