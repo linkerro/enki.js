@@ -428,7 +428,9 @@
             initValues: initValues
         };
         plugins.push(plugin);
-        plugin.init(context);
+        /* eslint-disable no-unused-expressions */
+        plugin.init && plugin.init(context);
+        /* eslint-enable no-unused-expressions */
     };
 
     self.registerComponent = function (name, initializer) {
