@@ -111,7 +111,7 @@
             }
             triggerNotifications(viewModel);
         } catch (ex) {
-            var error = new Error(0, 'Invalid binding: ' + element.getAttribute('data-bind') + '. ' + ex);
+            var error = new Error('Invalid binding: ' + element.getAttribute('data-bind') + '. ' + ex);
             throw error;
         }
     };
@@ -212,7 +212,7 @@
             var json = bindingString.replace(/[\w\d-]+/g, '"$&"');
             return JSON.parse('{' + json + '}');
         } catch (ex) {
-            var error = new Error(0, 'Invalid syntax in binding: ' + bindingString);
+            var error = new Error('Invalid syntax in binding: ' + bindingString);
             throw error;
         }
     };
@@ -245,7 +245,7 @@
                     if (typeof(propertyName) === 'object' && propertyName.converter) {
                         var converterContext = propertyName;
                         if (!converters[converterContext.converter]) {
-                            var error = new Error(0, 'No such converter: ' + converterContext.converter);
+                            var error = new Error('No such converter: ' + converterContext.converter);
                             throw error;
                         }
                         self.addNotification(viewModel, converterContext.value, function () {
@@ -271,7 +271,7 @@
                 if (typeof(bindingContext.propertyValue) === 'function') {
                     bindingContext.element.onclick = bindingContext.propertyValue;
                 } else {
-                    var error = new Error(0, bindingContext.propertyValue + ' is not a function')
+                    var error = new Error(bindingContext.propertyValue + ' is not a function');
                     throw error;
                 }
             }

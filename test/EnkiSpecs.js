@@ -488,7 +488,7 @@ describe('error system', function () {
         enki.bindDocument({});
         expect(error).toBeDefined();
         expect(error.stackTrace).toBeDefined();
-        expect(error.message.indexOf('Invalid binding')>=0).toBe(true);
+        expect(error.message.indexOf('Invalid binding') >= 0).toBe(true);
         expect(error.original).toBeDefined();
         expect(error.url).toBeDefined();
     });

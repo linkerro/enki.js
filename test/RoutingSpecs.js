@@ -21,7 +21,7 @@ describe('enki routing', function () {
     /* eslint-enable no-unused-vars */
     var complexRouteExample = 'buy/products/1234/reviews/244';
 
-    var params,error;
+    var params, error;
 
     var component = function (componentContext) {
         params = componentContext;
@@ -102,6 +102,18 @@ describe('enki routing', function () {
         });
         enki.routing.changePage(complexRouteBadExample);
         expect(error).toBeDefined();
-        expect(error.message.indexOf('No registered route matched this url')>-1).toBe(true);
+        expect(error.message.indexOf('No registered route matched this url') > -1).toBe(true);
+    });
+
+    it('should fail if no component is found', function () {
+        enki.routing.registerRoute(defaultRoute);
+        enki.routing.registerComponent({
+            area: 'products',
+            name: 'discounts',
+            component: component
+        });
+        enki.routing.changePage(defaultUrlExample);
+        expect(error).toBeDefined();
+        expect(error.message.indexOf('No registered route matched component named:') > -1).toBe(true);
     });
 });

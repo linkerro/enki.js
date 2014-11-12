@@ -111,6 +111,10 @@
             window.history.pushState({}, '', url);
             var urlInfo = parseUrl(url);
             var componentConstructor = resolveComponent(urlInfo.params);
+            if(!componentConstructor){
+                var error = new Error('No registered route matched component named: ' + urlInfo.params.component);
+                throw error;
+            }
             pageComponent = componentConstructor(urlInfo.params);
         }catch(ex){
             enkiContext.logError(ex);
