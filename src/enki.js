@@ -435,7 +435,8 @@
     self.addPlugin = function (plugin) {
         var context = {
             initValues: initValues,
-            logError: logError
+            logError: logError,
+            bindElements: bindElements
         };
         plugins.push(plugin);
         /* eslint-disable no-unused-expressions */

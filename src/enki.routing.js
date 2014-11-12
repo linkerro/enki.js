@@ -10,6 +10,7 @@
     /* eslint-disable no-unused-vars */
     var pageComponent;
     /* eslint-enable no-unused-vars */
+    var container;
 
     routing.init = function (context) {
         enkiContext = context;
@@ -106,6 +107,12 @@
         return componentLocation[params.component];
     };
 
+    var initializeTemplate = function (pageComponent) {
+        var componentTemplate = window.document.getElementById(pageComponent.template);
+        container.innerHTML = componentTemplate.innerHTML;
+        enki.bindDocument(pageComponent.viewModel, container.id);
+    };
+
     enki.routing.changePage = function (url) {
         try{
             window.history.pushState({}, '', url);
@@ -116,6 +123,7 @@
                 throw error;
             }
             pageComponent = componentConstructor(urlInfo.params);
+            initializeTemplate(pageComponent);
         }catch(ex){
             enkiContext.logError(ex);
         }
@@ -125,6 +133,10 @@
         routes = [];
         components = {};
         areas = {};
+    };
+
+    enki.routing.registerContainer = function (containerId) {
+        container = window.document.getElementById(containerId);
     };
 
 })();

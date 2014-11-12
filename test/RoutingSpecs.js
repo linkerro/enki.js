@@ -16,6 +16,10 @@ describe('enki routing', function () {
         name: 'complexRoute'
     };
 
+    var defaultTemplate = '<script type="text/html" id="defaultTemplate">' +
+        '<div id="templateResult" data-bind="text:area"></div>' +
+        '</script>';
+
     /* eslint-disable no-unused-vars */
     var complexRouteBadExample = 'buy/products/1234/reviews/244/fghjk';
     /* eslint-enable no-unused-vars */
@@ -27,8 +31,10 @@ describe('enki routing', function () {
         params = componentContext;
 
         return {
-            viewModel: {},
-            template: 'templateName'
+            viewModel: {
+                area: params.area
+            },
+            template: 'defaultTemplate'
         };
     };
 
@@ -40,6 +46,8 @@ describe('enki routing', function () {
         enki.exceptions.addListener(function (errorInfo) {
             error = errorInfo;
         });
+        setFixtures('<div id="routingContainer"></div>' + defaultTemplate);
+        enki.routing.registerContainer('routingContainer');
     });
 
     afterEach(function () {
@@ -115,5 +123,19 @@ describe('enki routing', function () {
         enki.routing.changePage(defaultUrlExample);
         expect(error).toBeDefined();
         expect(error.message.indexOf('No registered route matched component named:') > -1).toBe(true);
+    });
+
+    it('should render the appropriate template', function () {
+        enki.routing.registerRoute(defaultRoute);
+        enki.routing.registerComponent({
+            area: 'products',
+            name: 'reviews',
+            component: component
+        });
+        enki.routing.changePage(defaultUrlExample);
+        var div = document.getElementById('templateResult');
+        expect(div).toBeTruthy();
+        expect(div.innerHTML).toBe('products');
+        expect(error).toBeUndefined();
     });
 });
