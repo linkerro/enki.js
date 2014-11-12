@@ -111,18 +111,23 @@
             }
             triggerNotifications(viewModel);
         } catch (ex) {
-            throw 'Invalid binding: ' + element.getAttribute('data-bind') + '. ' + ex;
+            var error = new Error(0, 'Invalid binding: ' + element.getAttribute('data-bind') + '. ' + ex);
+            throw error;
         }
     };
 
     self.bindDocument = function (viewModel, elementId) {
-        self.watch(viewModel);
-        var elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind*="if"]');
-        bindElements(elements, viewModel);
-        elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind*="foreach"]');
-        bindElements(elements, viewModel);
-        elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind]');
-        bindElements(elements, viewModel);
+        try {
+            self.watch(viewModel);
+            var elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind*="if"]');
+            bindElements(elements, viewModel);
+            elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind*="foreach"]');
+            bindElements(elements, viewModel);
+            elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind]');
+            bindElements(elements, viewModel);
+        } catch (ex) {
+            logError(ex);
+        }
     };
 
     self.addNotification = function (viewModel, propertyName, func) {
@@ -207,7 +212,8 @@
             var json = bindingString.replace(/[\w\d-]+/g, '"$&"');
             return JSON.parse('{' + json + '}');
         } catch (ex) {
-            throw 'Invalid syntax in binding: ' + bindingString;
+            var error = new Error(0, 'Invalid syntax in binding: ' + bindingString);
+            throw error;
         }
     };
 
@@ -239,7 +245,8 @@
                     if (typeof(propertyName) === 'object' && propertyName.converter) {
                         var converterContext = propertyName;
                         if (!converters[converterContext.converter]) {
-                            throw 'No such converter: ' + converterContext.converter;
+                            var error = new Error(0, 'No such converter: ' + converterContext.converter);
+                            throw error;
                         }
                         self.addNotification(viewModel, converterContext.value, function () {
                             bindingContext.propertyValue = converters[converterContext.converter].toView
@@ -264,7 +271,8 @@
                 if (typeof(bindingContext.propertyValue) === 'function') {
                     bindingContext.element.onclick = bindingContext.propertyValue;
                 } else {
-                    throw bindingContext.propertyValue + ' is not a function';
+                    var error = new Error(0, bindingContext.propertyValue + ' is not a function')
+                    throw error;
                 }
             }
         },
@@ -393,7 +401,7 @@
         component: {
             init: function (bindingContext) {
                 var settings = {};
-                for(var property in bindingContext.propertyName) {
+                for (var property in bindingContext.propertyName) {
                     if (property !== 'name') {
                         settings[property] = getPropertyValue(bindingContext.viewModel, property);
                     }
@@ -426,7 +434,8 @@
 
     self.addPlugin = function (plugin) {
         var context = {
-            initValues: initValues
+            initValues: initValues,
+            logError: logError
         };
         plugins.push(plugin);
         /* eslint-disable no-unused-expressions */
@@ -449,6 +458,20 @@
         clearListeners: function () {
             exceptionListeners = [];
         }
+    };
+
+    var logError = function (error) {
+        exceptionListeners.forEach(function (listener) {
+            /* eslint-disable no-unused-expressions */
+            listener && listener({
+                message: error.message,
+                userAgent: window.navigator.userAgent,
+                stackTrace: error.stack,
+                original: error,
+                url: window.document.URL
+            });
+            /* eslint-enable no-unused-expressions */
+        });
     };
 
 })();

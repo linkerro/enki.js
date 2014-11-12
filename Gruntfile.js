@@ -23,7 +23,7 @@ module.exports = function (grunt) {
             options: {
                 specs: 'test/*.js',
                 vendor: 'test/lib/jasmine-2.0.0/jasmine-dom-fixtures.js',
-                keepRunner: false
+                keepRunner: true
             },
             target: {
                 src: 'src/*.js'

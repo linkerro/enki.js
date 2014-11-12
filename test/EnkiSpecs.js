@@ -73,7 +73,12 @@ describe('enki object initializer', function () {
 describe('enki document binder', function () {
     it('should fail on bad databinding information', function () {
         setFixtures('<div data-bind="click: ,lakjsdflkjf"></div>');
-        expect(enki.bindDocument).toThrow();
+        var hasError;
+        enki.exceptions.addListener(function (error) {
+            hasError = error;
+        });
+        enki.bindDocument();
+        expect(hasError).toBeDefined();
     });
 
     xit('should parse data-bound items', function () {
@@ -397,6 +402,7 @@ describe('enki bindings', function () {
         });
     });
 });
+
 describe('templating system', function () {
     it('should bind a template', function () {
         setFixtures('<script type="text/html" id="template"><div id="testDiv" data-bind="text: prop"></div></script>' +
@@ -471,82 +477,19 @@ describe('converter system', function () {
         expect(div.innerHTML).toBe(viewModel.date.toLocaleTimeString());
     });
 });
-describe('enki validation', function () {
-    beforeEach(function () {
-        setFixtures('');
-    });
-    describe('initialization', function () {
-        it('should associate validation metadata to an object', function () {
-            var viewModel = {
-                stringProperty: 'test'
-            };
-            var validationInfo = {
-                stringProperty: {
-                    required: true
-                }
-            };
-            enki.validation.addMetadata(viewModel, validationInfo);
-            expect(viewModel.__values__.stringProperty.validationAttributes.required).toBe(true);
-        });
-        it('should trigger the validation when a property is changed', function () {
-            var viewModel = {
-                stringProperty: 'test'
-            };
-            var validationInfo = {
-                stringProperty: {
-                    required: true
-                }
-            };
-            enki.validation.addMetadata(viewModel, validationInfo);
-            enki.bindDocument(viewModel);
-            viewModel.stringProperty = 'new value';
-            expect(viewModel.__values__.stringProperty.isValid).toBe(true);
-        });
-    });
-    describe('bindings', function () {
-        var viewModel;
-        var validationInfo;
-        beforeEach(function () {
-            viewModel = {
-                textProperty: 'some text'
-            };
-            validationInfo = {
-                textProperty: {
-                    required: true
-                }
-            };
-        });
-        it('should show a validation message when model is invalid', function () {
-            setFixtures('<input id="input" type="text" data-bind="value: textProperty" />' +
-            '<div id="validation" data-bind="validationMessage:{for:textProperty}"></div>');
-            enki.validation.addMetadata(viewModel, validationInfo);
-            enki.bindDocument(viewModel);
-            var input = document.getElementById('input');
-            var validation = document.getElementById('validation');
-            input.value = '';
-            input.onchange();
-            expect(validation.innerHTML).toBe('Field is required');
-        });
-        it('should add the required class on an element', function () {
-            setFixtures('<input id="input" type="text" data-bind="value: textProperty" />');
-            enki.validation.addMetadata(viewModel, validationInfo);
-            enki.bindDocument(viewModel);
-            var input = document.getElementById('input');
-            input.value = '';
-            input.onchange();
-            expect(input.classList.contains('invalidField')).toBe(true);
-        });
-    });
-});
 
 describe('error system', function () {
-    xit('should offer you a place to attach an error logger', function () {
+    it('should offer you a place to attach an error logger', function () {
         var error;
         setFixtures('<div id="test" data-bind="text:lkajsdflkj"></div>');
-        enki.logging.addListener(function (exception) {
+        enki.exceptions.addListener(function (exception) {
             error = exception;
         });
         enki.bindDocument({});
         expect(error).toBeDefined();
+        expect(error.stackTrace).toBeDefined();
+        expect(error.message.indexOf('Invalid binding')>=0).toBe(true);
+        expect(error.original).toBeDefined();
+        expect(error.url).toBeDefined();
     });
 });

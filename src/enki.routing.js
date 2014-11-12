@@ -1,6 +1,7 @@
 (function () {
     "use strict";
     var routing = {};
+    var enkiContext;
     var routes = [];
     var components = {};
     var areas = {};
@@ -10,13 +11,14 @@
     var pageComponent;
     /* eslint-enable no-unused-vars */
 
+    routing.init = function (context) {
+        enkiContext = context;
+    };
+
     enki.addPlugin(routing);
 
     enki.routing = {};
 
-    enki.routing.go = function (url) {
-        window.history.pushState({}, '', url);
-    };
 
     enki.routing.registerRoot = function (url) {
         rootUrl = url;
@@ -70,7 +72,7 @@
             cleanUrl = cleanUrl.replace(token + '/', '');
             cleanUrl = cleanUrl.replace(token, '');
         });
-        var tokenValues = cleanUrl.match(new RegExp(tokenMatch,'gi'));
+        var tokenValues = cleanUrl.match(new RegExp(tokenMatch, 'gi'));
         var tokens = {};
         tokenValues.forEach(function (tokenValue, index) {
             tokens[route.tokens[index]] = tokenValue;
@@ -78,31 +80,41 @@
         return tokens;
     };
     var parseUrl = function (url) {
-        var urlComponents = {};
+        var urlComponents;
         for (var i = 0; i < routes.length; i++) {
             var match = url.match(new RegExp(routes[i].matchString, 'gi'));
-            if (match && match.length === 1) {
-                urlComponents.params = getUrlComponents(url, routes[i]);
-                urlComponents.route = routes[i];
+            if (match && match.length === 1 && match[0] === url) {
+                urlComponents = {
+                    params: getUrlComponents(url, routes[i]),
+                    route: routes[i]
+                };
                 break;
             }
+        }
+        if (!urlComponents) {
+            var error = new Error('No registered route matched this url: ' + url);
+            throw error;
         }
         return urlComponents;
     };
 
     var resolveComponent = function (params) {
         var componentLocation = components;
-        if(params.area) {
+        if (params.area) {
             componentLocation = areas[params.area];
         }
         return componentLocation[params.component];
     };
 
     enki.routing.changePage = function (url) {
-        window.history.pushState({}, '', url);
-        var urlInfo = parseUrl(url);
-        var componentConstructor = resolveComponent(urlInfo.params);
-        pageComponent = componentConstructor(urlInfo.params);
+        try{
+            window.history.pushState({}, '', url);
+            var urlInfo = parseUrl(url);
+            var componentConstructor = resolveComponent(urlInfo.params);
+            pageComponent = componentConstructor(urlInfo.params);
+        }catch(ex){
+            enkiContext.logError(ex);
+        }
     };
 
     enki.routing.clear = function () {
