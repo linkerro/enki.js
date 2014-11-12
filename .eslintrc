@@ -3,7 +3,15 @@
     "browser": true
   },
   "globals": {
-    "enki": true
+    "enki": true,
+    "expect": true,
+    "describe": true,
+    "xdescribe": true,
+    "it": true,
+    "xit": true,
+    "setFixtures": true,
+    "beforeEach": true,
+    "afterEach": true
   },
   "rules": {
     "quotes": "single",

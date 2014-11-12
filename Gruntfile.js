@@ -16,7 +16,7 @@ module.exports = function (grunt) {
         },
         eslint: {
             target: {
-                src: 'src/*.js'
+                src: ['src/*.js','test/*.js']
             }
         },
         jasmine: {

@@ -1,5 +1,10 @@
+/* eslint-disable global-strict */
+'use strict';
+/* eslint-enable global-strict */
+
 describe('enki object initializer', function () {
-    var viewModel1 = {normalProperty: 1,
+    var viewModel1 = {
+        normalProperty: 1,
         objectProperty: {nestedProperty: 1},
         arrayProperty: [1, 2, 3],
         testFunction: function () {
@@ -66,28 +71,21 @@ describe('enki object initializer', function () {
 });
 
 describe('enki document binder', function () {
-    var viewModel1 = {normalProperty: 1,
-        objectProperty: {nestedProperty: 1},
-        arrayProperty: [1, 2, 3],
-        testFunction: function () {
-            return true;
-        }
-    };
     it('should fail on bad databinding information', function () {
-        setFixtures(sandbox('<div data-bind="click: ,lakjsdflkjf"></div>'));
+        setFixtures('<div data-bind="click: ,lakjsdflkjf"></div>');
         expect(enki.bindDocument).toThrow();
     });
 
     xit('should parse data-bound items', function () {
-        setFixtures(sandbox('<div data-bind="click: testFunction"></div>'));
+        setFixtures('<div data-bind="click: testFunction"></div>');
         enki.bindDocument();
         expect(enki.bindingInfo).toEqual({click: 'testFunction'});
     });
 
     xit('should parse nested objects', function () {
-        setFixtures(sandbox('<div data-bind="style: {backgroundColor:test,padding:5px}"></div>'));
+        setFixtures('<div data-bind="style: {backgroundColor:test,padding:5px}"></div>');
         enki.bindDocument();
-        expect(enki.bindingInfo).toEqual({style: {backgroundColor: 'test', padding: '5px'}})
+        expect(enki.bindingInfo).toEqual({style: {backgroundColor: 'test', padding: '5px'}});
     });
 });
 
@@ -95,7 +93,7 @@ describe('enki bindings', function () {
     describe('text and value bindings', function () {
         it('should trigger one way binding', function () {
             var viewModel = {normalProperty: 1};
-            setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>'));
+            setFixtures('<div id="bindingTest" data-bind="text: normalProperty"></div>');
             enki.bindDocument(viewModel);
             viewModel.normalProperty = 'lkajsdflkjsf';
             var element = document.getElementById('bindingTest');
@@ -103,8 +101,8 @@ describe('enki bindings', function () {
         });
         it('should trigger two way binding', function () {
             var viewModel = {normalProperty: 1};
-            setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>' +
-                '<input id="bindingTest2" type="text" data-bind="value: normalProperty" />'));
+            setFixtures('<div id="bindingTest" data-bind="text: normalProperty"></div>' +
+            '<input id="bindingTest2" type="text" data-bind="value: normalProperty" />');
             enki.bindDocument(viewModel);
             var element = document.getElementById('bindingTest');
             var input = document.getElementById('bindingTest2');
@@ -114,8 +112,8 @@ describe('enki bindings', function () {
         });
         it('should trigger two way live binding', function () {
             var viewModel = {normalProperty: 1};
-            setFixtures(sandbox('<div id="bindingTest" data-bind="text: normalProperty"></div>' +
-                '<input id="bindingTest2" type="text" data-bind="liveValue: normalProperty" />'));
+            setFixtures('<div id="bindingTest" data-bind="text: normalProperty"></div>' +
+            '<input id="bindingTest2" type="text" data-bind="liveValue: normalProperty" />');
             enki.bindDocument(viewModel);
             var element = document.getElementById('bindingTest');
             var input = document.getElementById('bindingTest2');
@@ -124,14 +122,16 @@ describe('enki bindings', function () {
             expect(element.innerHTML).toBe(input.value);
         });
         it('should trigger bindings for computed properties', function () {
-            var viewModel = {property1: 'sdf',
-                property2: 'sdf'};
+            var viewModel = {
+                property1: 'sdf',
+                property2: 'sdf'
+            };
             enki.extend(viewModel, 'computed', function (model) {
                 return model.property1 + model.property2;
             });
             setFixtures('<div id="bindingTest" data-bind="text: computed"></div>' +
-                '<input id="input1" type="text" data-bind="liveValue: property1" />' +
-                '<input id="input2" type="text" data-bind="value: property2" />');
+            '<input id="input1" type="text" data-bind="liveValue: property1" />' +
+            '<input id="input2" type="text" data-bind="value: property2" />');
             enki.bindDocument(viewModel);
             var element = document.getElementById('bindingTest');
             var input1 = document.getElementById('input1');
@@ -144,8 +144,10 @@ describe('enki bindings', function () {
             expect(element.innerHTML).toBe(value + value);
         });
         it('should trigger bindings for multiple computed properties', function () {
-            var viewModel = {property1: 'sdf',
-                property2: 'sdf'};
+            var viewModel = {
+                property1: 'sdf',
+                property2: 'sdf'
+            };
             enki.extend(viewModel, 'computed', function (model) {
                 return model.property1 + model.property2;
             });
@@ -153,9 +155,9 @@ describe('enki bindings', function () {
                 return model.property2 + model.property1;
             });
             setFixtures('<div id="bindingTest" data-bind="text: computed"></div>' +
-                '<div id="bindingTest2" data-bind="text: computed2"></div>' +
-                '<input id="input1" type="text" data-bind="liveValue: property1" />' +
-                '<input id="input2" type="text" data-bind="value: property2" />');
+            '<div id="bindingTest2" data-bind="text: computed2"></div>' +
+            '<input id="input1" type="text" data-bind="liveValue: property1" />' +
+            '<input id="input2" type="text" data-bind="value: property2" />');
             enki.bindDocument(viewModel);
             var element1 = document.getElementById('bindingTest');
             var element2 = document.getElementById('bindingTest2');
@@ -173,11 +175,13 @@ describe('enki bindings', function () {
     });
     describe('click binding', function () {
         it('should trigger the clicked event', function () {
-            setFixtures(sandbox('<div id="clickTest" data-bind="click: testFunction"></div>'));
+            setFixtures('<div id="clickTest" data-bind="click: testFunction"></div>');
             var hasClicked = false;
-            var viewModel = {testFunction: function () {
-                hasClicked = true;
-            }};
+            var viewModel = {
+                testFunction: function () {
+                    hasClicked = true;
+                }
+            };
             enki.bindDocument(viewModel);
             document.getElementById('clickTest').onclick();
             expect(hasClicked).toBe(true);
@@ -207,8 +211,8 @@ describe('enki bindings', function () {
     describe('foreach binding', function () {
         it('should render and bind the foreach template', function () {
             setFixtures('<div id="div" data-bind="foreach:arrayProperty">' +
-                '<div class="test" data-bind="text: prop"></div>' +
-                '</div>');
+            '<div class="test" data-bind="text: prop"></div>' +
+            '</div>');
             var viewModel = {
                 arrayProperty: [
                     {prop: 1},
@@ -223,9 +227,9 @@ describe('enki bindings', function () {
         });
         it('should render and bind a foreach template containing multiple elements', function () {
             setFixtures('<div id="div" data-bind="foreach:arrayProperty">' +
-                '<div class="test" data-bind="text: prop"></div>' +
-                '<div class="test" data-bind="text: prop"></div>' +
-                '</div>');
+            '<div class="test" data-bind="text: prop"></div>' +
+            '<div class="test" data-bind="text: prop"></div>' +
+            '</div>');
             var viewModel = {
                 arrayProperty: [
                     {prop: 1},
@@ -338,8 +342,8 @@ describe('enki bindings', function () {
 
         it('should stop binding inside the if bound element', function () {
             setFixtures('<div id="container" data-bind="if:property">' +
-                '<span id="bound" data-bind="text:prop1"></span>' +
-                '</div>');
+            '<span id="bound" data-bind="text:prop1"></span>' +
+            '</div>');
             var viewModel = {
                 property: undefined
             };
@@ -355,11 +359,13 @@ describe('enki bindings', function () {
 
     describe('binding on elements instead of document', function () {
         it('should bind text and value fields', function () {
-            var viewModel = {prop1: 'lkjlkj',
-                prop2: 'dfvbnmngtyh'};
+            var viewModel = {
+                prop1: 'lkjlkj',
+                prop2: 'dfvbnmngtyh'
+            };
             setFixtures('<div id="view"><div id="textTest" data-bind="text:prop1"></div>' +
-                '<input type="text" id="valueTest" data-bind="value:prop2" /></div>' +
-                '<div id="outsideView" data-bind="textTest"></div>');
+            '<input type="text" id="valueTest" data-bind="value:prop2" /></div>' +
+            '<div id="outsideView" data-bind="textTest"></div>');
             enki.bindDocument(viewModel, 'view');
             var div = document.getElementById('textTest');
             var div2 = document.getElementById('outsideView');
@@ -369,13 +375,15 @@ describe('enki bindings', function () {
             expect(div2.innerHTML).toBe('');
         });
         it('should apply multiple specific elements binding', function () {
-            var viewModel = {prop1: 'lkjlkj',
-                prop2: 'dfvbnmngtyh'};
+            var viewModel = {
+                prop1: 'lkjlkj',
+                prop2: 'dfvbnmngtyh'
+            };
             var viewModel2 = {prop3: 'ljsdflkj'};
             setFixtures('<div id="view"><div id="textTest" data-bind="text:prop1"></div>' +
-                '<input type="text" id="valueTest" data-bind="value:prop2" /></div>' +
-                '<div id="outsideView" data-bind="textTest"></div>' +
-                '<div id="view2"><div id="prop3" data-bind="text:prop3"></div></div>');
+            '<input type="text" id="valueTest" data-bind="value:prop2" /></div>' +
+            '<div id="outsideView" data-bind="textTest"></div>' +
+            '<div id="view2"><div id="prop3" data-bind="text:prop3"></div></div>');
             enki.bindDocument(viewModel, 'view');
             enki.bindDocument(viewModel2, 'view2');
             var div = document.getElementById('textTest');
@@ -387,12 +395,12 @@ describe('enki bindings', function () {
             expect(div2.innerHTML).toBe('');
             expect(prop3.innerHTML).toBe(viewModel2.prop3);
         });
-    })
+    });
 });
 describe('templating system', function () {
     it('should bind a template', function () {
         setFixtures('<script type="text/html" id="template"><div id="testDiv" data-bind="text: prop"></div></script>' +
-            '<div data-bind="template: {name: template,model:model}"></div>');
+        '<div data-bind="template: {name: template,model:model}"></div>');
         var viewModel = {model: {prop: 'propertyValue'}};
         enki.bindDocument(viewModel);
         var div = document.getElementById('testDiv');
@@ -400,8 +408,8 @@ describe('templating system', function () {
     });
     it('should bind multiple templates', function () {
         setFixtures('<script type="text/html" id="template"><div class="testDiv" data-bind="text: prop"></div></script>' +
-            '<div id="div1" data-bind="template: {name: template,model:model}"></div>' +
-            '<div id="div2" data-bind="template: {name: template,model:model2}"></div>');
+        '<div id="div1" data-bind="template: {name: template,model:model}"></div>' +
+        '<div id="div2" data-bind="template: {name: template,model:model2}"></div>');
         var viewModel = {
             model: {prop: 'propertyValue'},
             model2: {prop: 'ftyuk,mnbftyj'}
@@ -417,10 +425,10 @@ describe('templating system', function () {
 describe('component system', function () {
     it('should bind components', function () {
         setFixtures('<script type="text/html" id="componentTemplate"><div class="testDiv" data-bind="text:prop"></div></script>' +
-            '<div id="div" data-bind="component: {name: component, model:model}"></div>');
+        '<div id="div" data-bind="component: {name: component, model:model}"></div>');
         enki.registerComponent('component', function (componentContext) {
             return {
-                viewModel: {prop:componentContext.model},
+                viewModel: {prop: componentContext.model},
                 template: 'componentTemplate'
             };
         });
@@ -445,7 +453,7 @@ describe('converter system', function () {
         expect(div.innerHTML).toBe('23.46');
     });
     it('should format short dates', function () {
-        setFixtures('<div id="formatted" data-bind="text:{value:date, converter:shortDate}"></div>')
+        setFixtures('<div id="formatted" data-bind="text:{value:date, converter:shortDate}"></div>');
         var viewModel = {
             date: new Date(1406795490414)
         };
@@ -510,7 +518,7 @@ describe('enki validation', function () {
         });
         it('should show a validation message when model is invalid', function () {
             setFixtures('<input id="input" type="text" data-bind="value: textProperty" />' +
-                '<div id="validation" data-bind="validationMessage:{for:textProperty}"></div>');
+            '<div id="validation" data-bind="validationMessage:{for:textProperty}"></div>');
             enki.validation.addMetadata(viewModel, validationInfo);
             enki.bindDocument(viewModel);
             var input = document.getElementById('input');
@@ -539,7 +547,6 @@ describe('error system', function () {
             error = exception;
         });
         enki.bindDocument({});
-        var div = document.getElementById('test');
-
+        expect(error).toBeDefined();
     });
-})
+});

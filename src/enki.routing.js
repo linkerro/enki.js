@@ -81,7 +81,7 @@
         var urlComponents = {};
         for (var i = 0; i < routes.length; i++) {
             var match = url.match(new RegExp(routes[i].matchString, 'gi'));
-            if (match.length === 1) {
+            if (match && match.length === 1) {
                 urlComponents.params = getUrlComponents(url, routes[i]);
                 urlComponents.route = routes[i];
                 break;

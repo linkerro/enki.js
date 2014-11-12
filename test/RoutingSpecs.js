@@ -1,3 +1,7 @@
+/* eslint-disable global-strict */
+'use strict';
+/* eslint-enable global-strict */
+
 describe('enki routing', function () {
 
     var defaultRoute = {
@@ -8,11 +12,13 @@ describe('enki routing', function () {
     var defaultUrlExample = 'products/reviews';
 
     var complexRoute = {
-        url:'{area}/{component}/{id}/reviews/{reviewId}',
-        name:'complexRoute'
+        url: '{area}/{component}/{id}/reviews/{reviewId}',
+        name: 'complexRoute'
     };
 
+    /* eslint-disable no-unused-vars */
     var complexRouteBadExample = 'buy/products/1234/reviews/244/fghjk';
+    /* eslint-enable no-unused-vars */
     var complexRouteExample = 'buy/products/1234/reviews/244';
 
     var params;
@@ -23,13 +29,12 @@ describe('enki routing', function () {
         return {
             viewModel: {},
             template: 'templateName'
-        }
+        };
     };
 
 
     beforeEach(function () {
         enki.routing.clear();
-        area = undefined;
         params = undefined;
     });
 
@@ -48,11 +53,11 @@ describe('enki routing', function () {
     it('should register components', function () {
         enki.routing.registerComponent({
             name: 'default',
-            component:component
+            component: component
         });
     });
 
-    xit('should identify route specified components', function () {
+    it('should identify route specified components', function () {
         enki.routing.registerRoute(complexRoute);
         enki.routing.registerComponent({
             name: 'products',
@@ -63,5 +68,18 @@ describe('enki routing', function () {
         expect(params.area).toBe('buy');
         expect(params.id).toBe('1234');
         expect(params.reviewId).toBe('244');
+    });
+
+    it('should identify the correct route', function () {
+        enki.routing.registerRoute(complexRoute);
+        enki.routing.registerRoute(defaultRoute);
+        enki.routing.registerComponent({
+            name: 'reviews',
+            area: 'products',
+            component: component
+        });
+        enki.routing.changePage(defaultUrlExample);
+        expect(params.area).toBe('products');
+        //expect(params.component)
     });
 });

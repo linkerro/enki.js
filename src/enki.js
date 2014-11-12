@@ -6,6 +6,7 @@
     var isInComputableCycle = false;
     var plugins = [];
     var components = {};
+    var exceptionListeners = [];
 
     var generateSetter = function (property) {
         var setter = function (value) {
@@ -439,6 +440,15 @@
 
     self.removeComponent = function (name) {
         delete components[name];
+    };
+
+    self.exceptions = {
+        addListener: function (listener) {
+            exceptionListeners.push(listener);
+        },
+        clearListeners: function () {
+            exceptionListeners = [];
+        }
     };
 
 })();
