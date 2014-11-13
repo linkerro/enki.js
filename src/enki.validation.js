@@ -9,7 +9,7 @@
     };
 
     validation.onWatch = function (viewModel) {
-        var values = viewModel.__values__;
+        var values = enkiContext.getMetadata(viewModel);
         for (var propertyName in values) {
             values[propertyName].validationMessages = []; //reset the messages for a property
             for (var attribute in values[propertyName].validationAttributes) {
@@ -32,11 +32,9 @@
     enki.validation = {};
 
     enki.validation.addMetadata = function (viewModel, validationInformation) {
-        if (!viewModel.__values__) {
-            enkiContext.initValues(viewModel);
-        }
+        var values = enkiContext.getMetadata(viewModel);
         for (var propertyName in validationInformation) {
-            viewModel.__values__[propertyName].validationAttributes = validationInformation[propertyName];
+            values[propertyName].validationAttributes = validationInformation[propertyName];
         }
     };
 
@@ -56,7 +54,8 @@
             var settings = bindingContext.propertyName;
             var propertyName = settings.for;
             enki.addListener(bindingContext.viewModel, propertyName, function () {
-                var propertyInfo = bindingContext.viewModel.__values__[propertyName];
+                var values = enkiContext.getMetadata(bindingContext.viewModel);
+                var propertyInfo = values[propertyName];
                 var isValid = propertyInfo.isValid;
                 if(!isValid) {
                     bindingContext.element.innerHTML = propertyInfo.validationMessages.join(' ');

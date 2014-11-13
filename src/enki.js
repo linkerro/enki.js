@@ -432,15 +432,21 @@
         }
     };
 
+    var getMetadata = function (viewModel) {
+        !viewModel.__values__ && initValues(viewModel);
+        return viewModel.__values__;
+    };
+
     self.addPlugin = function (plugin) {
-        var context = {
+        var pluginContext = {
             initValues: initValues,
             logError: logError,
-            bindElements: bindElements
+            bindElements: bindElements,
+            getMetadata: getMetadata
         };
         plugins.push(plugin);
         /* eslint-disable no-unused-expressions */
-        plugin.init && plugin.init(context);
+        plugin.init && plugin.init(pluginContext);
         /* eslint-enable no-unused-expressions */
     };
 
