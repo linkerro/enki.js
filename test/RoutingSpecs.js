@@ -16,6 +16,11 @@ describe('enki routing', function () {
         name: 'complexRoute'
     };
 
+    var optionalParameterRoute = {
+        url: '{area:buy}/{component:products}',
+        name: 'optionalParameterRoute'
+    };
+
     var defaultTemplate = '<script type="text/html" id="defaultTemplate">' +
         '<div id="templateResult" data-bind="text:area"></div>' +
         '</script>';
@@ -137,5 +142,29 @@ describe('enki routing', function () {
         expect(div).toBeTruthy();
         expect(div.innerHTML).toBe('products');
         expect(error).toBeUndefined();
+    });
+
+    it('should identify route optional parameters', function () {
+        enki.routing.registerRoute(optionalParameterRoute);
+        enki.routing.registerComponent({
+            name: 'products',
+            area: 'buy',
+            component: component
+        });
+        enki.routing.changePage('/');
+        expect(params.area).toBe('buy');
+        expect(params.component).toBe('products');
+    });
+
+    it('should partially apply optional parameters', function () {
+        enki.routing.registerRoute(optionalParameterRoute);
+        enki.routing.registerComponent({
+            name: 'products',
+            area: 'sell',
+            component: component
+        });
+        enki.routing.changePage('sell/');
+        expect(params.area).toBe('sell');
+        expect(params.component).toBe('products');
     });
 });

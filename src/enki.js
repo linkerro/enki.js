@@ -52,6 +52,10 @@
         return parts.length === 1 ? object[parts[0]] : getPropertyValue(object[parts[0]], '', parts.slice(1));
     };
 
+    /**
+     * The function that does all of the databinding for a document
+     * @param {object} object - the view-model object used for the binding process
+     */
     self.watch = function (object) {
         initValues(object);
         var values = object.__values__;
@@ -433,7 +437,9 @@
     };
 
     var getMetadata = function (viewModel) {
+        /* eslint-disable no-unused-expressions */
         !viewModel.__values__ && initValues(viewModel);
+        /* eslint-enable no-unused-expressions */
         return viewModel.__values__;
     };
 

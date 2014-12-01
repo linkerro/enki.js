@@ -17,6 +17,7 @@
     "quotes": "single",
     "no-underscore-dangle": 0,
     "no-use-before-define": 1,
-    "eol-last": 0
+    "eol-last": 0,
+    "space-unary-ops":0
   }
 }
