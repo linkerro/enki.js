@@ -1,4 +1,31 @@
-(function () {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: enki.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: enki.js</h1>
+
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>(function () {
     "use strict";
     var self = {};
     window.enki = self;
@@ -79,7 +106,7 @@
         }
 
         /* eslint-disable no-unused-expressions */
-        object.__values__.extensions && object.__values__.extensions.forEach(function (item) {
+        object.__values__.extensions &amp;&amp; object.__values__.extensions.forEach(function (item) {
             self.addComputable(item.model, item.propertyName, item.func);
         });
         /* eslint-enable no-unused-expressions */
@@ -87,7 +114,7 @@
         if (plugins.length > 0) {
             plugins.forEach(function (plugin) {
                 /* eslint-disable no-unused-expressions */
-                plugin.onWatch && plugin.onWatch(object);
+                plugin.onWatch &amp;&amp; plugin.onWatch(object);
                 /* eslint-enable no-unused-expressions */
             });
         }
@@ -105,7 +132,7 @@
 
     var bindElements = function (elements, viewModel) {
         try {
-            for (var i = 0; i < elements.length; i++) {
+            for (var i = 0; i &lt; elements.length; i++) {
                 var element = elements[i];
                 var attribute = element.getAttribute('data-bind');
                 if (attribute) {
@@ -122,14 +149,13 @@
 
     self.bindDocument = function (viewModel, elementId) {
         try {
-            var viewModelInstance = typeof(viewModel) === 'function' ? viewModel() : viewModel;
-            self.watch(viewModelInstance);
+            self.watch(viewModel);
             var elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind*="if"]');
-            bindElements(elements, viewModelInstance);
+            bindElements(elements, viewModel);
             elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind*="foreach"]');
-            bindElements(elements, viewModelInstance);
+            bindElements(elements, viewModel);
             elements = document.querySelectorAll((elementId ? '#' + elementId + ' ' : '') + '[data-bind]');
-            bindElements(elements, viewModelInstance);
+            bindElements(elements, viewModel);
         } catch (ex) {
             logError(ex);
         }
@@ -149,7 +175,7 @@
 
     self.removeCustomBinding = function (name) {
         /* eslint-disable no-unused-expressions */
-        bindings[name] && bindings[name].isCustom && delete bindings[name];
+        bindings[name] &amp;&amp; bindings[name].isCustom &amp;&amp; delete bindings[name];
         /* eslint-enable no-unused-expressions */
     };
 
@@ -160,7 +186,7 @@
 
     self.removeCustomConverter = function (name) {
         /* eslint-disable no-unused-expressions */
-        converters[name] && converters[name].isCustom && delete converters[name];
+        converters[name] &amp;&amp; converters[name].isCustom &amp;&amp; delete converters[name];
         /* eslint-enable no-unused-expressions */
     };
 
@@ -203,8 +229,8 @@
     var triggerNotifications = function (viewModel) {
         for (var propertyName in viewModel) {
             /* eslint-disable no-unused-expressions */
-            viewModel.__values__[propertyName] &&
-            viewModel.__values__[propertyName].notifications &&
+            viewModel.__values__[propertyName] &amp;&amp;
+            viewModel.__values__[propertyName].notifications &amp;&amp;
             viewModel.__values__[propertyName].notifications.forEach(function (notification) {
                 notification(viewModel[propertyName]);
             });
@@ -214,7 +240,7 @@
 
     var parseBindingInfo = function (bindingString) {
         try {
-            var json = bindingString.replace(/[\w\d-]+/g, '"$&"');
+            var json = bindingString.replace(/[\w\d-]+/g, '"$&amp;"');
             return JSON.parse('{' + json + '}');
         } catch (ex) {
             var error = new Error('Invalid syntax in binding: ' + bindingString);
@@ -232,7 +258,7 @@
 
     var addBindings = function (element, bindingInfo, viewModel) {
         for (var bindingName in bindingInfo) {
-            if (bindings[bindingName] && !element.allreadyBound) {
+            if (bindings[bindingName] &amp;&amp; !element.allreadyBound) {
                 var propertyName = bindingInfo[bindingName];
                 var propertyValue = viewModel[propertyName];
                 var bindingContext = {
@@ -243,11 +269,11 @@
                 };
 
                 /* eslint-disable no-unused-expressions */
-                bindings[bindingName].init && bindings[bindingName].init(bindingContext);
+                bindings[bindingName].init &amp;&amp; bindings[bindingName].init(bindingContext);
                 /* eslint-enable no-unused-expressions */
 
                 if (bindings[bindingName].update) {
-                    if (typeof(propertyName) === 'object' && propertyName.converter) {
+                    if (typeof(propertyName) === 'object' &amp;&amp; propertyName.converter) {
                         var converterContext = propertyName;
                         if (!converters[converterContext.converter]) {
                             var error = new Error('No such converter: ' + converterContext.converter);
@@ -276,7 +302,8 @@
                 if (typeof(bindingContext.propertyValue) === 'function') {
                     bindingContext.element.onclick = bindingContext.propertyValue;
                 } else {
-                    throw new Error(bindingContext.propertyValue + ' is not a function');
+                    var error = new Error(bindingContext.propertyValue + ' is not a function');
+                    throw error;
                 }
             }
         },
@@ -437,9 +464,7 @@
     };
 
     var getMetadata = function (viewModel) {
-        /* eslint-disable no-unused-expressions */
-        !viewModel.__values__ && initValues(viewModel);
-        /* eslint-enable no-unused-expressions */
+        !viewModel.__values__ &amp;&amp; initValues(viewModel);
         return viewModel.__values__;
     };
 
@@ -452,7 +477,7 @@
         };
         plugins.push(plugin);
         /* eslint-disable no-unused-expressions */
-        plugin.init && plugin.init(pluginContext);
+        plugin.init &amp;&amp; plugin.init(pluginContext);
         /* eslint-enable no-unused-expressions */
     };
 
@@ -470,29 +495,43 @@
         },
         clearListeners: function () {
             exceptionListeners = [];
-        },
-        shouldHideErrors: true
-    };
-
-    var logError = function (error) {
-        var errorWrapper = {
-            message: error.message,
-            userAgent: window.navigator.userAgent,
-            stackTrace: error.stack,
-            original: error,
-            url: window.document.URL
-        };
-        exceptionListeners.forEach(function (listener) {
-            /* eslint-disable no-unused-expressions */
-            listener && listener(errorWrapper);
-            /* eslint-enable no-unused-expressions */
-        });
-        if (!self.exceptions.shouldHideErrors) {
-            console.info(self.exceptions.shouldHideErrors);
-            var enkiError = new Error('Enki encountered a problem: ' + errorWrapper.message);
-            enkiError.originalError = error;
-            throw enkiError;
         }
     };
 
-})();
+    var logError = function (error) {
+        exceptionListeners.forEach(function (listener) {
+            /* eslint-disable no-unused-expressions */
+            listener &amp;&amp; listener({
+                message: error.message,
+                userAgent: window.navigator.userAgent,
+                stackTrace: error.stack,
+                original: error,
+                url: window.document.URL
+            });
+            /* eslint-enable no-unused-expressions */
+        });
+    };
+
+})();</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Thu Nov 13 2014 15:02:21 GMT+0200 (GTB Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

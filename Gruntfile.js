@@ -24,7 +24,7 @@ module.exports = function (grunt) {
                 specs: 'test/*.js',
                 vendor: 'test/lib/jasmine-2.0.0/jasmine-dom-fixtures.js',
                 host: 'http://127.0.0.1:8000/',
-                keepRunner: false
+                keepRunner: true
             },
             target: {
                 src: 'src/*.js'
@@ -52,5 +52,6 @@ module.exports = function (grunt) {
 
     // Set up the tasks.
     grunt.registerTask('default', ['eslint', 'connect', 'jasmine', 'uglify']);
-    grunt.registerTask('test', ['connect', 'jasmine', 'eslint']);
+    grunt.registerTask('test', ['connect', 'jasmine']);
+    grunt.registerTask('fulltest', ['connect', 'jasmine', 'eslint']);
 };

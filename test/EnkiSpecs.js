@@ -71,6 +71,9 @@ describe('enki object initializer', function () {
 });
 
 describe('enki document binder', function () {
+    afterEach(function () {
+        enki.exceptions.shouldHideErrors = false;
+    })
     it('should fail on bad databinding information', function () {
         setFixtures('<div data-bind="click: ,lakjsdflkjf"></div>');
         var hasError;
@@ -79,6 +82,19 @@ describe('enki document binder', function () {
         });
         enki.bindDocument();
         expect(hasError).toBeDefined();
+    });
+
+    it('should execute viewModel constructors', function () {
+        setFixtures('<div id="div" data-bind="text:title"></div>');
+        var div = document.getElementById('div');
+        var viewModel = function () {
+            return {
+                title:'it works'
+            }
+        };
+        enki.exceptions.shouldHideErrors = false;
+        enki.bindDocument(viewModel);
+        expect(div.innerHTML).toBe('it works');
     });
 
     xit('should parse data-bound items', function () {
@@ -479,6 +495,13 @@ describe('converter system', function () {
 });
 
 describe('error system', function () {
+    beforeEach(function () {
+        enki.exceptions.shouldHideErrors = true;
+    });
+    afterEach(function () {
+        enki.exceptions.shouldHideErrors = true;
+    });
+
     it('should offer you a place to attach an error logger', function () {
         var error;
         setFixtures('<div id="test" data-bind="text:lkajsdflkj"></div>');
@@ -491,5 +514,16 @@ describe('error system', function () {
         expect(error.message.indexOf('Invalid binding') >= 0).toBe(true);
         expect(error.original).toBeDefined();
         expect(error.url).toBeDefined();
+    });
+
+    it('should not do error hiding if asked to do so', function () {
+        var error;
+        setFixtures('<div id="test" data-bind="text:lkajsdflkj"></div>');
+        enki.exceptions.addListener(function (exception) {
+            error = exception;
+        });
+        enki.exceptions.shouldHideErrors = false;
+
+        expect(enki.bindDocument).toThrow();
     });
 });
