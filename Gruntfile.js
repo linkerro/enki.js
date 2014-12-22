@@ -24,7 +24,7 @@ module.exports = function (grunt) {
                 specs: 'test/*.js',
                 vendor: 'test/lib/jasmine-2.0.0/jasmine-dom-fixtures.js',
                 host: 'http://127.0.0.1:8000/',
-                keepRunner: true
+                keepRunner: false
             },
             target: {
                 src: 'src/*.js'

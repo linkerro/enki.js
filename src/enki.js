@@ -488,7 +488,6 @@
             /* eslint-enable no-unused-expressions */
         });
         if (!self.exceptions.shouldHideErrors) {
-            console.info(self.exceptions.shouldHideErrors);
             var enkiError = new Error('Enki encountered a problem: ' + errorWrapper.message);
             enkiError.originalError = error;
             throw enkiError;

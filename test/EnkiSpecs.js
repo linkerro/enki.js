@@ -72,8 +72,8 @@ describe('enki object initializer', function () {
 
 describe('enki document binder', function () {
     afterEach(function () {
-        enki.exceptions.shouldHideErrors = false;
-    })
+        enki.exceptions.shouldHideErrors = true;
+    });
     it('should fail on bad databinding information', function () {
         setFixtures('<div data-bind="click: ,lakjsdflkjf"></div>');
         var hasError;
@@ -89,8 +89,8 @@ describe('enki document binder', function () {
         var div = document.getElementById('div');
         var viewModel = function () {
             return {
-                title:'it works'
-            }
+                title: 'it works'
+            };
         };
         enki.exceptions.shouldHideErrors = false;
         enki.bindDocument(viewModel);
@@ -517,11 +517,7 @@ describe('error system', function () {
     });
 
     it('should not do error hiding if asked to do so', function () {
-        var error;
         setFixtures('<div id="test" data-bind="text:lkajsdflkj"></div>');
-        enki.exceptions.addListener(function (exception) {
-            error = exception;
-        });
         enki.exceptions.shouldHideErrors = false;
 
         expect(enki.bindDocument).toThrow();
