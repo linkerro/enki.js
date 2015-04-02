@@ -274,7 +274,9 @@
         click: {
             init: function (bindingContext) {
                 if (typeof(bindingContext.propertyValue) === 'function') {
-                    bindingContext.element.onclick = bindingContext.propertyValue;
+                    bindingContext.element.onclick = function (event) {
+                        bindingContext.propertyValue(event, bindingContext.viewModel);
+                    };
                 } else {
                     throw new Error(bindingContext.propertyValue + ' is not a function');
                 }

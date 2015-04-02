@@ -207,6 +207,38 @@ describe('enki bindings', function () {
             document.getElementById('clickTest').onclick();
             expect(hasClicked).toBe(true);
         });
+        it('should propagate event', function () {
+            setFixtures('<div id="clickTest" data-bind="click: testFunction"></div>');
+            var mouseEvent = undefined;
+            var viewModel = {
+                testFunction: function (event) {
+                    mouseEvent = event;
+                }
+            };
+            enki.bindDocument(viewModel);
+
+            var newEvent = document.createEvent('MouseEvents');
+            newEvent.initMouseEvent('click',true,true);
+
+            document.getElementById('clickTest').dispatchEvent(newEvent);
+            expect(mouseEvent).toBe(newEvent);
+        });
+        it('should send the model', function () {
+            setFixtures('<div id="clickTest" data-bind="click: testFunction"></div>');
+            var receivedModel = undefined;
+            var viewModel = {
+                testFunction: function (event,model) {
+                    receivedModel = model;
+                }
+            };
+            enki.bindDocument(viewModel);
+
+            var newEvent = document.createEvent('MouseEvents');
+            newEvent.initMouseEvent('click',true,true);
+
+            document.getElementById('clickTest').dispatchEvent(newEvent);
+            expect(receivedModel).toBe(viewModel);
+        });
     });
     describe('visible binding', function () {
         it('should hide and show the given element', function () {
