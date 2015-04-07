@@ -231,7 +231,15 @@
     };
 
     var addBindings = function (element, bindingInfo, viewModel) {
-        var getPropertyInfo = function (model, names) {
+        var getPropertyInfo = function (model, name) {
+            if(typeof name !=='string'){
+                return {
+                    value: model[name],
+                    model: model,
+                    name: name
+                };
+            }
+            var names = name.split('.');
             if (names.length === 1) {
                 return {
                     value: model[names[0]],
@@ -245,7 +253,7 @@
         for (var bindingName in bindingInfo) {
             if (bindings[bindingName] && !element.allreadyBound) {
                 var propertyName = bindingInfo[bindingName];
-                var propertyInfo = getPropertyInfo(viewModel, propertyName.split('.'));
+                var propertyInfo = getPropertyInfo(viewModel, propertyName);
                 var bindingContext = {
                     element: element,
                     propertyValue: propertyInfo.value,
