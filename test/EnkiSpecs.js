@@ -77,11 +77,13 @@ describe('enki document binder', function () {
     it('should fail on bad databinding information', function () {
         setFixtures('<div data-bind="click: ,lakjsdflkjf"></div>');
         var hasError;
+        enki.exceptions.shouldHideErrors = true;
         enki.exceptions.addListener(function (error) {
             hasError = error;
         });
         enki.bindDocument();
         expect(hasError).toBeDefined();
+        enki.exceptions.shouldHideErrors = false;
     });
 
     it('should execute viewModel constructors', function () {
@@ -95,6 +97,18 @@ describe('enki document binder', function () {
         enki.exceptions.shouldHideErrors = false;
         enki.bindDocument(viewModel);
         expect(div.innerHTML).toBe('it works');
+    });
+
+    it('should bind to nested properties', function () {
+        setFixtures('<div id="div" data-bind="text:property.nestedProperty"></div>');
+        var div=document.getElementById('div');
+        var viewModel = {
+            property: {
+                nestedProperty: 'works'
+            }
+        };
+        enki.bindDocument(viewModel);
+        expect(div.innerHTML).toEqual(viewModel.property.nestedProperty);
     });
 
     xit('should parse data-bound items', function () {
@@ -209,7 +223,7 @@ describe('enki bindings', function () {
         });
         it('should propagate event', function () {
             setFixtures('<div id="clickTest" data-bind="click: testFunction"></div>');
-            var mouseEvent = undefined;
+            var mouseEvent;
             var viewModel = {
                 testFunction: function (event) {
                     mouseEvent = event;
@@ -218,23 +232,23 @@ describe('enki bindings', function () {
             enki.bindDocument(viewModel);
 
             var newEvent = document.createEvent('MouseEvents');
-            newEvent.initMouseEvent('click',true,true);
+            newEvent.initMouseEvent('click', true, true);
 
             document.getElementById('clickTest').dispatchEvent(newEvent);
             expect(mouseEvent).toBe(newEvent);
         });
         it('should send the model', function () {
             setFixtures('<div id="clickTest" data-bind="click: testFunction"></div>');
-            var receivedModel = undefined;
+            var receivedModel;
             var viewModel = {
-                testFunction: function (event,model) {
+                testFunction: function (event, model) {
                     receivedModel = model;
                 }
             };
             enki.bindDocument(viewModel);
 
             var newEvent = document.createEvent('MouseEvents');
-            newEvent.initMouseEvent('click',true,true);
+            newEvent.initMouseEvent('click', true, true);
 
             document.getElementById('clickTest').dispatchEvent(newEvent);
             expect(receivedModel).toBe(viewModel);
@@ -297,6 +311,27 @@ describe('enki bindings', function () {
             expect(divs[2].innerHTML).toBe('2');
             expect(divs[3].innerHTML).toBe('2');
         });
+        it('should render and bind an computed property', function () {
+            setFixtures('<div id="div" data-bind="foreach:computedArray">' +
+            '<div class="test" data-bind="text: prop2"></div>' +
+            '</div>');
+            var viewModel = {
+                arrayProperty: [
+                    {prop: 1},
+                    {prop: 2}
+                ]
+            };
+            enki.extend(viewModel, 'computedArray', function (model) {
+                return model.arrayProperty.map(function (item) {
+                    return {prop2: item.prop};
+                });
+            });
+            enki.bindDocument(viewModel);
+            var divs = document.getElementsByClassName('test');
+            expect(divs.length).toBe(2);
+            expect(divs[0].innerHTML).toBe('1');
+            expect(divs[1].innerHTML).toBe('2');
+        });
     });
     describe('attributes binding', function () {
         it('should bind to element attributes', function () {
@@ -342,15 +377,38 @@ describe('enki bindings', function () {
         it('should propagate the attached event', function () {
             setFixtures('<div id="div" data-bind="event:{onclick:click}"></div>');
             var wasClicked = false;
+            var capturedEvent;
             var viewModel = {
-                click: function () {
+                click: function (event) {
                     wasClicked = true;
+                    capturedEvent = event;
                 }
             };
             enki.bindDocument(viewModel);
-            var div = document.getElementById('div');
-            div.onclick();
+            var newEvent = document.createEvent('MouseEvents');
+            newEvent.initMouseEvent('click', true, true);
+
+            document.getElementById('div').dispatchEvent(newEvent);
             expect(wasClicked).toBe(true);
+            expect(capturedEvent).toBe(newEvent);
+        });
+        it('should have access to the model', function () {
+            setFixtures('<div id="div" data-bind="event:{onclick:click}"></div>');
+            var wasClicked = false;
+            var capturedModel;
+            var viewModel = {
+                click: function (event, model) {
+                    wasClicked = true;
+                    capturedModel = model;
+                }
+            };
+            enki.bindDocument(viewModel);
+            var newEvent = document.createEvent('MouseEvents');
+            newEvent.initMouseEvent('click', true, true);
+
+            document.getElementById('div').dispatchEvent(newEvent);
+            expect(wasClicked).toBe(true);
+            expect(capturedModel).toBe(viewModel);
         });
     });
 
@@ -406,8 +464,6 @@ describe('enki bindings', function () {
             viewModel.property = {prop1: 'test'};
             expect(div.innerHTML).toBe('<span id="bound" data-bind="text:prop1">test</span>');
         });
-
-
     });
 
     describe('binding on elements instead of document', function () {
@@ -447,6 +503,24 @@ describe('enki bindings', function () {
             expect(input.value).toBe(viewModel.prop2);
             expect(div2.innerHTML).toBe('');
             expect(prop3.innerHTML).toBe(viewModel2.prop3);
+        });
+    });
+
+    describe('adding custom binding', function () {
+        it('should add custom binding', function () {
+            var capturedBindingContext;
+            var customBinding = {
+                init: function (bindingContext) {
+                    capturedBindingContext = bindingContext;
+                }
+            };
+            enki.addCustomBinding('customBinding', customBinding);
+
+            setFixtures('<div data-bind="customBinding:notRelevantInThisCase"></div>');
+            var viewModel = {};
+            enki.bindDocument(viewModel);
+
+            expect(capturedBindingContext.viewModel).toBe(viewModel);
         });
     });
 });

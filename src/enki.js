@@ -214,7 +214,7 @@
 
     var parseBindingInfo = function (bindingString) {
         try {
-            var json = bindingString.replace(/[\w\d-]+/g, '"$&"');
+            var json = bindingString.replace(/[.\w\d-]+/g, '"$&"');
             return JSON.parse('{' + json + '}');
         } catch (ex) {
             var error = new Error('Invalid syntax in binding: ' + bindingString);
@@ -231,15 +231,26 @@
     };
 
     var addBindings = function (element, bindingInfo, viewModel) {
+        var getPropertyInfo = function (model, names) {
+            if (names.length === 1) {
+                return {
+                    value: model[names[0]],
+                    model: model,
+                    name: names[0]
+                };
+            }
+            var nextModel = model[names[0]];
+            return getPropertyInfo(nextModel, names.splice(1));
+        };
         for (var bindingName in bindingInfo) {
             if (bindings[bindingName] && !element.allreadyBound) {
                 var propertyName = bindingInfo[bindingName];
-                var propertyValue = viewModel[propertyName];
+                var propertyInfo = getPropertyInfo(viewModel, propertyName.split('.'));
                 var bindingContext = {
                     element: element,
-                    propertyValue: propertyValue,
-                    viewModel: viewModel,
-                    propertyName: propertyName
+                    propertyValue: propertyInfo.value,
+                    viewModel: propertyInfo.model,
+                    propertyName: propertyInfo.name
                 };
 
                 /* eslint-disable no-unused-expressions */
@@ -259,13 +270,14 @@
                             bindings[bindingName].update(bindingContext);
                         });
                     } else {
-                        self.addNotification(viewModel, propertyName, function (value) {
+                        bindings[bindingName].update(bindingContext);
+                        self.addNotification(bindingContext.viewModel, bindingContext.propertyName, function (value) {
                             bindingContext.propertyValue = value;
                             bindings[bindingName].update(bindingContext);
                         });
                     }
                 }
-                memorizeBoundElement(viewModel, propertyName, element);
+                memorizeBoundElement(bindingContext.viewModel, bindingContext.propertyName, element);
             }
         }
     };
@@ -375,7 +387,10 @@
             init: function (bindingContext) {
                 var configuration = bindingContext.propertyName;
                 for (var eventName in configuration) {
-                    bindingContext.element[eventName] = bindingContext.viewModel[configuration[eventName]];
+                    var eventCall = function (event) {
+                        bindingContext.viewModel[configuration[eventName]](event, bindingContext.viewModel);
+                    };
+                    bindingContext.element[eventName] = eventCall;
                 }
             }
         },
@@ -473,7 +488,7 @@
         clearListeners: function () {
             exceptionListeners = [];
         },
-        shouldHideErrors: true
+        shouldHideErrors: false
     };
 
     var logError = function (error) {
