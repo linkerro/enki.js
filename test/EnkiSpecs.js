@@ -101,7 +101,7 @@ describe('enki document binder', function () {
 
     it('should bind to nested properties', function () {
         setFixtures('<div id="div" data-bind="text:property.nestedProperty"></div>');
-        var div=document.getElementById('div');
+        var div = document.getElementById('div');
         var viewModel = {
             property: {
                 nestedProperty: 'works'

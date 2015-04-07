@@ -232,7 +232,7 @@
 
     var addBindings = function (element, bindingInfo, viewModel) {
         var getPropertyInfo = function (model, name) {
-            if(typeof name !=='string'){
+            if (typeof name !== 'string') {
                 return {
                     value: model[name],
                     model: model,
