@@ -78,7 +78,7 @@
         initValues(object);
         var values = object.__values__;
 
-        if(typeof object === 'Array'){
+        if (object instanceof Array) {
             addPropertyMetadata(object, 'length', values);
         }
 
@@ -232,6 +232,29 @@
         viewModel.__values__[propertyName].elements.push(element);
     };
 
+    var wireBindingUpdates = function (bindingName, propertyName, viewModel, bindingContext) {
+        if (bindings[bindingName].update) {
+            if (typeof(propertyName) === 'object' && propertyName.converter) {
+                var converterContext = propertyName;
+                if (!converters[converterContext.converter]) {
+                    var error = new Error('No such converter: ' + converterContext.converter);
+                    throw error;
+                }
+                self.addNotification(viewModel, converterContext.value, function () {
+                    bindingContext.propertyValue = converters[converterContext.converter].toView
+                        .call(self, viewModel[converterContext.value], converterContext.parameter);
+                    bindings[bindingName].update(bindingContext);
+                });
+            } else {
+                bindings[bindingName].update(bindingContext);
+                self.addNotification(bindingContext.viewModel, bindingContext.propertyName, function (value) {
+                    bindingContext.propertyValue = value;
+                    bindings[bindingName].update(bindingContext);
+                });
+            }
+        }
+        return {converterContext: converterContext, error: error};
+    };
     var addBindings = function (element, bindingInfo, viewModel) {
         var getPropertyInfo = function (model, name) {
             if (typeof name !== 'string' && !(name instanceof Array)) {
@@ -265,38 +288,35 @@
 
                 bindings[bindingName].init && bindings[bindingName].init(bindingContext);
 
-                if (bindings[bindingName].update) {
-                    if (typeof(propertyName) === 'object' && propertyName.converter) {
-                        var converterContext = propertyName;
-                        if (!converters[converterContext.converter]) {
-                            var error = new Error('No such converter: ' + converterContext.converter);
-                            throw error;
-                        }
-                        self.addNotification(viewModel, converterContext.value, function () {
-                            bindingContext.propertyValue = converters[converterContext.converter].toView
-                                .call(self, viewModel[converterContext.value], converterContext.parameter);
-                            bindings[bindingName].update(bindingContext);
-                        });
-                    } else {
-                        bindings[bindingName].update(bindingContext);
-                        self.addNotification(bindingContext.viewModel, bindingContext.propertyName, function (value) {
-                            bindingContext.propertyValue = value;
-                            bindings[bindingName].update(bindingContext);
-                        });
-                    }
-                }
+                wireBindingUpdates(bindingName, propertyName, viewModel, bindingContext);
                 memorizeBoundElement(bindingContext.viewModel, bindingContext.propertyName, element);
             }
         }
+    };
+
+    self.addEvent = function (element, eventName, handler) {
+        var events = element[eventName + 'events'] || [];
+        if (typeof element[eventName] === 'function' && !element[eventName + 'events']) {
+            events.push(element[eventName]);
+
+        }
+        events.push(handler);
+        element[eventName + 'events'] = events;
+        element[eventName] = function (event) {
+            events.forEach(function (callback) {
+                callback(event);
+            });
+        };
     };
 
     var bindings = {
         click: {
             init: function (bindingContext) {
                 if (typeof(bindingContext.propertyValue) === 'function') {
-                    bindingContext.element.onclick = function (event) {
+                    var onclick = function (event) {
                         bindingContext.propertyValue(event, bindingContext.viewModel);
                     };
+                    self.addEvent(bindingContext.element, 'onclick', onclick);
                 } else {
                     throw new Error(bindingContext.propertyValue + ' is not a function');
                 }
@@ -319,9 +339,10 @@
         },
         liveValue: {
             init: function (bindingContext) {
-                bindingContext.element.onkeyup = function () {
+                var onkeyup = function () {
                     bindingContext.viewModel[bindingContext.propertyName] = bindingContext.element.value;
                 };
+                self.addEvent(bindingContext.element, 'onkeyup', onkeyup);
             },
             update: function (bindingContext) {
                 bindingContext.element.value = bindingContext.propertyValue;
@@ -387,15 +408,16 @@
                     var eventCall = function (event) {
                         bindingContext.viewModel[configuration[eventName]](event, bindingContext.viewModel);
                     };
-                    bindingContext.element[eventName] = eventCall;
+                    self.addEvent(bindingContext.element, eventName, eventCall);
                 }
             }
         },
         checked: {
             init: function (bindingContext) {
-                bindingContext.element.onclick = function () {
+                var onclick = function () {
                     bindingContext.viewModel[bindingContext.propertyName] = bindingContext.element.checked;
                 };
+                self.addEvent(bindingContext.element, 'onclick', onclick);
             },
             update: function (bindingContext) {
                 bindingContext.element.checked = bindingContext.propertyValue;

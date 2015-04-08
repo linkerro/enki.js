@@ -113,14 +113,15 @@ describe('enki document binder', function () {
         expect(div.innerHTML).toEqual(viewModel.property.nestedProperty);
     });
 
-    fit('should bind to native objects', function () {
+    xit('should bind to native objects', function () {
         setFixtures('<div id="div" data-bind="text:prop.length"></div>');
-        var viewModel={
-            prop:[1,3]
+        var viewModel = {
+            prop: [1, 3]
         };
+        var div = document.getElementById('div');
         enki.bindDocument(viewModel);
         expect(div.innerHTML).toBe('2');
-    })
+    });
 });
 
 describe('enki bindings', function () {
@@ -587,6 +588,25 @@ describe('converter system', function () {
         enki.bindDocument(viewModel);
         var div = document.getElementById('formatted');
         expect(div.innerHTML).toBe(viewModel.date.toLocaleTimeString());
+    });
+});
+
+describe('safe event handeling', function () {
+    it('should not overwrite previous events', function () {
+        setFixtures('<div id="div"></div>');
+        var bindingEventFired = false;
+        var previousEventFired = false;
+        var div = document.getElementById('div');
+        var click = function () {
+            bindingEventFired = true;
+        };
+        div.onclick = function () {
+            previousEventFired = true;
+        };
+        enki.addEvent(div, 'onclick', click);
+        div.onclick();
+        expect(bindingEventFired).toBe(true);
+        expect(previousEventFired).toBe(true);
     });
 });
 
