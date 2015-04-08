@@ -104,24 +104,23 @@ describe('enki document binder', function () {
         var div = document.getElementById('div');
         var viewModel = {
             property: {
-                nestedProperty: 'works'
+                nestedProperty: 'works',
+                nestedProperty2: true
             }
         };
         enki.bindDocument(viewModel);
+        viewModel.nestedProperty2 = false;
         expect(div.innerHTML).toEqual(viewModel.property.nestedProperty);
     });
 
-    xit('should parse data-bound items', function () {
-        setFixtures('<div data-bind="click: testFunction"></div>');
-        enki.bindDocument();
-        expect(enki.bindingInfo).toEqual({click: 'testFunction'});
-    });
-
-    xit('should parse nested objects', function () {
-        setFixtures('<div data-bind="style: {backgroundColor:test,padding:5px}"></div>');
-        enki.bindDocument();
-        expect(enki.bindingInfo).toEqual({style: {backgroundColor: 'test', padding: '5px'}});
-    });
+    fit('should bind to native objects', function () {
+        setFixtures('<div id="div" data-bind="text:prop.length"></div>');
+        var viewModel={
+            prop:[1,3]
+        };
+        enki.bindDocument(viewModel);
+        expect(div.innerHTML).toBe('2');
+    })
 });
 
 describe('enki bindings', function () {
@@ -260,18 +259,9 @@ describe('enki bindings', function () {
             var viewModel = {isVisible: false};
             enki.bindDocument(viewModel);
             var div = document.getElementById('hidable');
-            expect(div.style.display).toBe('none');
+            expect(div.hidden).toBe(true);
             viewModel.isVisible = true;
-            expect(div.style.display).toBe('');
-        });
-        it('should keep the original display mode', function () {
-            setFixtures('<div id="hidable" data-bind="visible: isVisible" style="display: inline"></div>');
-            var viewModel = {isVisible: false};
-            enki.bindDocument(viewModel);
-            var div = document.getElementById('hidable');
-            expect(div.style.display).toBe('none');
-            viewModel.isVisible = true;
-            expect(div.style.display).toBe('inline');
+            expect(div.hidden).toBe(false);
         });
     });
 

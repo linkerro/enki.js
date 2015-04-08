@@ -52,6 +52,24 @@
         return parts.length === 1 ? object[parts[0]] : getPropertyValue(object[parts[0]], '', parts.slice(1));
     };
 
+    var addPropertyMetadata = function (object, propertyName, values) {
+        if (typeof(object[propertyName]) === 'function') {
+            return;
+        }
+        values[propertyName].notifications = values[propertyName].notifications || [];
+        values[propertyName].computableNotifications = values[propertyName].computableNotifications || [];
+        values[propertyName].value = object[propertyName];
+
+        Object.defineProperty(object, propertyName, {
+            set: generateSetter(values[propertyName]),
+            get: generateGetter(values[propertyName])
+        });
+        object[propertyName] = values[propertyName].value;
+        if (typeof(object[propertyName]) === 'object') {
+            self.watch(object[propertyName]);
+        }
+    };
+
     /**
      * The function that does all of the databinding for a document
      * @param {object} object - the view-model object used for the binding process
@@ -60,35 +78,23 @@
         initValues(object);
         var values = object.__values__;
 
-        for (var propertyName in object) {
-            if (typeof(object[propertyName]) === 'function') {
-                continue;
-            }
-            values[propertyName].notifications = values[propertyName].notifications || [];
-            values[propertyName].computableNotifications = values[propertyName].computableNotifications || [];
-            values[propertyName].value = object[propertyName];
-
-            Object.defineProperty(object, propertyName, {
-                set: generateSetter(values[propertyName]),
-                get: generateGetter(values[propertyName])
-            });
-            object[propertyName] = values[propertyName].value;
-            if (typeof(object[propertyName]) === 'object') {
-                self.watch(object[propertyName]);
-            }
+        if(typeof object === 'Array'){
+            addPropertyMetadata(object, 'length', values);
         }
 
-        /* eslint-disable no-unused-expressions */
+        for (var propertyName in object) {
+            addPropertyMetadata(object, propertyName, values);
+        }
+
         object.__values__.extensions && object.__values__.extensions.forEach(function (item) {
             self.addComputable(item.model, item.propertyName, item.func);
         });
-        /* eslint-enable no-unused-expressions */
 
         if (plugins.length > 0) {
             plugins.forEach(function (plugin) {
-                /* eslint-disable no-unused-expressions */
+
                 plugin.onWatch && plugin.onWatch(object);
-                /* eslint-enable no-unused-expressions */
+
             });
         }
     };
@@ -148,9 +154,7 @@
     };
 
     self.removeCustomBinding = function (name) {
-        /* eslint-disable no-unused-expressions */
         bindings[name] && bindings[name].isCustom && delete bindings[name];
-        /* eslint-enable no-unused-expressions */
     };
 
     self.addCustomConverter = function (name, converter) {
@@ -159,9 +163,9 @@
     };
 
     self.removeCustomConverter = function (name) {
-        /* eslint-disable no-unused-expressions */
+
         converters[name] && converters[name].isCustom && delete converters[name];
-        /* eslint-enable no-unused-expressions */
+
     };
 
     self.extend = function (model, propertyName, func) {
@@ -182,9 +186,9 @@
         // Magic warning: Accessing the model[propertyName] triggers its getter and logs every other observable that is
         // touched. I know it's stupid to write it like this and I'm open to suggestions.
         isInComputableCycle = true;
-        /* eslint-disable no-unused-expressions */
+
         model[propertyName];
-        /* eslint-enable no-unused-expressions */
+
         isInComputableCycle = false;
 
         var values = model.__values__;
@@ -202,13 +206,11 @@
 
     var triggerNotifications = function (viewModel) {
         for (var propertyName in viewModel) {
-            /* eslint-disable no-unused-expressions */
             viewModel.__values__[propertyName] &&
             viewModel.__values__[propertyName].notifications &&
             viewModel.__values__[propertyName].notifications.forEach(function (notification) {
                 notification(viewModel[propertyName]);
             });
-            /* eslint-enable no-unused-expressions */
         }
     };
 
@@ -232,14 +234,14 @@
 
     var addBindings = function (element, bindingInfo, viewModel) {
         var getPropertyInfo = function (model, name) {
-            if (typeof name !== 'string') {
+            if (typeof name !== 'string' && !(name instanceof Array)) {
                 return {
                     value: model[name],
                     model: model,
                     name: name
                 };
             }
-            var names = name.split('.');
+            var names = typeof name === 'string' ? name.split('.') : name;
             if (names.length === 1) {
                 return {
                     value: model[names[0]],
@@ -261,9 +263,7 @@
                     propertyName: propertyInfo.name
                 };
 
-                /* eslint-disable no-unused-expressions */
                 bindings[bindingName].init && bindings[bindingName].init(bindingContext);
-                /* eslint-enable no-unused-expressions */
 
                 if (bindings[bindingName].update) {
                     if (typeof(propertyName) === 'object' && propertyName.converter) {
@@ -355,17 +355,8 @@
             }
         },
         visible: {
-            init: function (bindingContext) {
-                var element = bindingContext.element;
-                var display = '';
-                self.addListener(bindingContext.viewModel, bindingContext.propertyName, function (value) {
-                    if (value) {
-                        element.style.display = display;
-                    } else {
-                        display = element.style.display === 'none' ? '' : element.style.display;
-                        element.style.display = 'none';
-                    }
-                });
+            update: function (bindingContext) {
+                bindingContext.element.hidden = !bindingContext.propertyValue;
             }
         },
         attributes: {
@@ -383,10 +374,8 @@
                 var configuration = bindingContext.propertyName;
                 for (var className in configuration) {
                     self.addListener(bindingContext.viewModel, configuration[className], function (value) {
-                        /* eslint-disable no-unused-expressions */
                         value ? bindingContext.element.classList.add(className) :
                             bindingContext.element.classList.remove(className);
-                        /* eslint-enable no-unused-expressions */
                     });
                 }
             }
@@ -462,9 +451,7 @@
     };
 
     var getMetadata = function (viewModel) {
-        /* eslint-disable no-unused-expressions */
         !viewModel.__values__ && initValues(viewModel);
-        /* eslint-enable no-unused-expressions */
         return viewModel.__values__;
     };
 
@@ -476,9 +463,7 @@
             getMetadata: getMetadata
         };
         plugins.push(plugin);
-        /* eslint-disable no-unused-expressions */
         plugin.init && plugin.init(pluginContext);
-        /* eslint-enable no-unused-expressions */
     };
 
     self.registerComponent = function (name, initializer) {
@@ -508,9 +493,7 @@
             url: window.document.URL
         };
         exceptionListeners.forEach(function (listener) {
-            /* eslint-disable no-unused-expressions */
             listener && listener(errorWrapper);
-            /* eslint-enable no-unused-expressions */
         });
         if (!self.exceptions.shouldHideErrors) {
             var enkiError = new Error('Enki encountered a problem: ' + errorWrapper.message);
