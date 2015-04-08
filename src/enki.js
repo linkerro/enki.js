@@ -78,10 +78,6 @@
         initValues(object);
         var values = object.__values__;
 
-        if (object instanceof Array) {
-            addPropertyMetadata(object, 'length', values);
-        }
-
         for (var propertyName in object) {
             addPropertyMetadata(object, propertyName, values);
         }
