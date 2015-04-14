@@ -3,15 +3,19 @@
 /* eslint-enable global-strict */
 
 describe('enki object initializer', function () {
-    var viewModel1 = {
-        normalProperty: 1,
-        objectProperty: {nestedProperty: 1},
-        arrayProperty: [1, 2, 3],
-        testFunction: function () {
-            return true;
-        }
-    };
-    enki.watch(viewModel1);
+    var viewModel1;
+
+    beforeEach(function () {
+        viewModel1 = {
+            normalProperty: 1,
+            objectProperty: {nestedProperty: 1},
+            arrayProperty: [1, 2, 3],
+            testFunction: function () {
+                return true;
+            }
+        };
+        enki.watch(viewModel1);
+    });
 
     it('should attach functioning notifiers', function () {
         var updateResult = 0;
@@ -71,9 +75,6 @@ describe('enki object initializer', function () {
 });
 
 describe('enki document binder', function () {
-    afterEach(function () {
-        enki.exceptions.shouldHideErrors = true;
-    });
     it('should fail on bad databinding information', function () {
         setFixtures('<div data-bind="click: ,lakjsdflkjf"></div>');
         var hasError;
@@ -113,7 +114,7 @@ describe('enki document binder', function () {
         expect(div.innerHTML).toEqual(viewModel.property.nestedProperty);
     });
 
-    xit('should bind to native objects', function () {
+    it('should bind to native objects', function () {
         setFixtures('<div id="div" data-bind="text:prop.length"></div>');
         var viewModel = {
             prop: [1, 3]
@@ -545,7 +546,8 @@ describe('component system', function () {
     it('should bind components', function () {
         setFixtures('<script type="text/html" id="componentTemplate"><div class="testDiv" data-bind="text:prop"></div></script>' +
         '<div id="div" data-bind="component: {name: component, model:model}"></div>');
-        enki.registerComponent('component', function (componentContext) {
+        enki.registerComponent('component',
+            function (componentContext) {
             return {
                 viewModel: {prop: componentContext.model},
                 template: 'componentTemplate'
